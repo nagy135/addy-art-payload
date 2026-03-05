@@ -1,4 +1,4 @@
-import type { Product, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
+import type { ArchiveBlock as ArchiveBlockProps, Post } from '@/payload-types'
 
 import configPromise from '@payload-config'
 import { DefaultDocumentIDType, getPayload } from 'payload'
@@ -13,33 +13,19 @@ export const ArchiveBlock: React.FC<
     className?: string
   }
 > = async (props) => {
-  const { id, categories, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
+  const { id, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
 
   const limit = limitFromProps || 3
 
-  let posts: Product[] = []
+  let posts: Post[] = []
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
 
-    const flattenedCategories = categories?.map((category) => {
-      if (typeof category === 'object') return category.id
-      else return category
-    })
-
     const fetchedProducts = await payload.find({
-      collection: 'products',
+      collection: 'posts',
       depth: 1,
       limit,
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
-              },
-            },
-          }
-        : {}),
     })
 
     posts = fetchedProducts.docs
@@ -47,7 +33,7 @@ export const ArchiveBlock: React.FC<
     if (selectedDocs?.length) {
       const filteredSelectedPosts = selectedDocs.map((post) => {
         if (typeof post.value === 'object') return post.value
-      }) as Product[]
+      }) as Post[]
 
       posts = filteredSelectedPosts
     }

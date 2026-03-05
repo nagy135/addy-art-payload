@@ -7,50 +7,40 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
-import { useTheme } from '@/providers/Theme'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { Suspense, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { cssVariables } from '@/cssVariables'
-import { CheckoutForm } from '@/components/forms/CheckoutForm'
 import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
-import { Address } from '@/payload-types'
+import { Address, Product, Variant } from '@/payload-types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 
-const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
-const stripe = loadStripe(apiKey)
-
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
-  const { cart } = useCart()
+  const { cart, clearCart } = useCart()
   const [error, setError] = useState<null | string>(null)
-  const { theme } = useTheme()
   /**
    * State to manage the email input for guest checkout.
    */
   const [email, setEmail] = useState('')
   const [emailEditable, setEmailEditable] = useState(true)
-  const [paymentData, setPaymentData] = useState<null | Record<string, unknown>>(null)
-  const { initiatePayment } = usePayments()
+  const { confirmOrder } = usePayments()
   const { addresses } = useAddresses()
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
   const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
   const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
-  const [isProcessingPayment, setProcessingPayment] = useState(false)
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false)
 
   const cartIsEmpty = !cart || !cart.items || !cart.items.length
 
-  const canGoToPayment = Boolean(
+  const canCreateOrder = Boolean(
     (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
   )
 
@@ -76,42 +66,71 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [])
 
-  const initiatePaymentIntent = useCallback(
-    async (paymentID: string) => {
-      try {
-        const paymentData = (await initiatePayment(paymentID, {
-          additionalData: {
-            ...(email ? { customerEmail: email } : {}),
-            billingAddress,
-            shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
-          },
-        })) as Record<string, unknown>
+  const createOrder = useCallback(async () => {
+    setIsCreatingOrder(true)
+    try {
+      const result = await confirmOrder('manual', {
+        additionalData: {
+          ...(email ? { customerEmail: email } : {}),
+          billingAddress,
+          shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
+        },
+      })
 
-        if (paymentData) {
-          setPaymentData(paymentData)
-        }
-      } catch (error) {
-        const errorData = error instanceof Error ? JSON.parse(error.message) : {}
-        let errorMessage = 'An error occurred while initiating payment.'
+      if (result && typeof result === 'object' && 'orderID' in result && result.orderID) {
+        const accessToken = 'accessToken' in result ? (result.accessToken as string) : ''
+        const queryParams = new URLSearchParams()
 
-        if (errorData?.cause?.code === 'OutOfStock') {
-          errorMessage = 'One or more items in your cart are out of stock.'
+        if (email) {
+          queryParams.set('email', email)
         }
 
-        setError(errorMessage)
-        toast.error(errorMessage)
+        if (accessToken) {
+          queryParams.set('accessToken', accessToken)
+        }
+
+        const queryString = queryParams.toString()
+
+        await clearCart()
+        router.push(`/orders/${result.orderID}${queryString ? `?${queryString}` : ''}`)
       }
-    },
-    [billingAddress, billingAddressSameAsShipping, shippingAddress],
-  )
+    } catch (error) {
+      let errorData: { cause?: { code?: string } } = {}
 
-  if (!stripe) return null
+      if (error instanceof Error) {
+        try {
+          errorData = JSON.parse(error.message)
+        } catch {
+          errorData = {}
+        }
+      }
 
-  if (cartIsEmpty && isProcessingPayment) {
+      let errorMessage = 'An error occurred while creating the order.'
+
+      if (errorData?.cause?.code === 'OutOfStock') {
+        errorMessage = 'One or more items in your cart are out of stock.'
+      }
+
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setIsCreatingOrder(false)
+    }
+  }, [
+    billingAddress,
+    billingAddressSameAsShipping,
+    clearCart,
+    confirmOrder,
+    email,
+    router,
+    shippingAddress,
+  ])
+
+  if (cartIsEmpty && isCreatingOrder) {
     return (
       <div className="py-12 w-full items-center justify-center">
         <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
-          <p>Processing your payment...</p>
+          <p>Creating your order...</p>
         </div>
         <LoadingSpinner />
       </div>
@@ -195,7 +214,7 @@ export const CheckoutPage: React.FC = () => {
               actions={
                 <Button
                   variant={'outline'}
-                  disabled={Boolean(paymentData)}
+                  disabled={isCreatingOrder}
                   onClick={(e) => {
                     e.preventDefault()
                     setBillingAddress(undefined)
@@ -223,7 +242,7 @@ export const CheckoutPage: React.FC = () => {
           <Checkbox
             id="shippingTheSameAsBilling"
             checked={billingAddressSameAsShipping}
-            disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
+            disabled={Boolean(isCreatingOrder || (!user && (!email || Boolean(emailEditable))))}
             onCheckedChange={(state) => {
               setBillingAddressSameAsShipping(state as boolean)
             }}
@@ -239,7 +258,7 @@ export const CheckoutPage: React.FC = () => {
                   actions={
                     <Button
                       variant={'outline'}
-                      disabled={Boolean(paymentData)}
+                      disabled={isCreatingOrder}
                       onClick={(e) => {
                         e.preventDefault()
                         setShippingAddress(undefined)
@@ -269,20 +288,18 @@ export const CheckoutPage: React.FC = () => {
           </>
         )}
 
-        {!paymentData && (
-          <Button
-            className="self-start"
-            disabled={!canGoToPayment}
-            onClick={(e) => {
-              e.preventDefault()
-              void initiatePaymentIntent('stripe')
-            }}
-          >
-            Go to payment
-          </Button>
-        )}
+        <Button
+          className="self-start"
+          disabled={!canCreateOrder || isCreatingOrder}
+          onClick={(e) => {
+            e.preventDefault()
+            void createOrder()
+          }}
+        >
+          {isCreatingOrder ? 'Creating order...' : 'Create order'}
+        </Button>
 
-        {!paymentData?.['clientSecret'] && error && (
+        {error && (
           <div className="my-8">
             <Message error={error} />
 
@@ -297,58 +314,6 @@ export const CheckoutPage: React.FC = () => {
             </Button>
           </div>
         )}
-
-        <Suspense fallback={<React.Fragment />}>
-          {/* @ts-ignore */}
-          {paymentData && paymentData?.['clientSecret'] && (
-            <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
-              {error && <p>{`Error: ${error}`}</p>}
-              <Elements
-                options={{
-                  appearance: {
-                    theme: 'stripe',
-                    variables: {
-                      borderRadius: '6px',
-                      colorPrimary: '#858585',
-                      gridColumnSpacing: '20px',
-                      gridRowSpacing: '20px',
-                      colorBackground: theme === 'dark' ? '#0a0a0a' : cssVariables.colors.base0,
-                      colorDanger: cssVariables.colors.error500,
-                      colorDangerText: cssVariables.colors.error500,
-                      colorIcon:
-                        theme === 'dark' ? cssVariables.colors.base0 : cssVariables.colors.base1000,
-                      colorText: theme === 'dark' ? '#858585' : cssVariables.colors.base1000,
-                      colorTextPlaceholder: '#858585',
-                      fontFamily: 'Geist, sans-serif',
-                      fontSizeBase: '16px',
-                      fontWeightBold: '600',
-                      fontWeightNormal: '500',
-                      spacingUnit: '4px',
-                    },
-                  },
-                  clientSecret: paymentData['clientSecret'] as string,
-                }}
-                stripe={stripe}
-              >
-                <div className="flex flex-col gap-8">
-                  <CheckoutForm
-                    customerEmail={email}
-                    billingAddress={billingAddress}
-                    setProcessingPayment={setProcessingPayment}
-                  />
-                  <Button
-                    variant="ghost"
-                    className="self-start"
-                    onClick={() => setPaymentData(null)}
-                  >
-                    Cancel payment
-                  </Button>
-                </div>
-              </Elements>
-            </div>
-          )}
-        </Suspense>
       </div>
 
       {!cartIsEmpty && (
@@ -373,20 +338,27 @@ export const CheckoutPage: React.FC = () => {
               if (isVariant) {
                 price = variant?.priceInUSD
 
-                const imageVariant = product.gallery?.find((item) => {
-                  if (!item.variantOption) return false
-                  const variantOptionID =
-                    typeof item.variantOption === 'object'
-                      ? item.variantOption.id
-                      : item.variantOption
+                const imageVariant = product.gallery?.find(
+                  (galleryItem: NonNullable<Product['gallery']>[number]) => {
+                    if (!galleryItem.variantOption) return false
+                    const variantOptionID =
+                      typeof galleryItem.variantOption === 'object'
+                        ? galleryItem.variantOption.id
+                        : galleryItem.variantOption
 
-                  const hasMatch = variant?.options?.some((option) => {
-                    if (typeof option === 'object') return option.id === variantOptionID
-                    else return option === variantOptionID
-                  })
+                    const hasMatch = variant?.options?.some(
+                      (variantOption: NonNullable<Variant['options']>[number]) => {
+                        if (typeof variantOption === 'object') {
+                          return variantOption.id === variantOptionID
+                        }
 
-                  return hasMatch
-                })
+                        return variantOption === variantOptionID
+                      },
+                    )
+
+                    return hasMatch
+                  },
+                )
 
                 if (imageVariant && typeof imageVariant.image !== 'string') {
                   image = imageVariant.image
@@ -408,8 +380,8 @@ export const CheckoutPage: React.FC = () => {
                       {variant && typeof variant === 'object' && (
                         <p className="text-sm font-mono text-primary/50 tracking-widest">
                           {variant.options
-                            ?.map((option) => {
-                              if (typeof option === 'object') return option.label
+                            ?.map((variantOption: NonNullable<Variant['options']>[number]) => {
+                              if (typeof variantOption === 'object') return variantOption.label
                               return null
                             })
                             .join(', ')}

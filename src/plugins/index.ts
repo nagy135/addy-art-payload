@@ -5,7 +5,7 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
 
-import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
+import { manualAdapter } from '@/payments/manual'
 
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -117,10 +117,8 @@ export const plugins: Plugin[] = [
     },
     payments: {
       paymentMethods: [
-        stripeAdapter({
-          secretKey: process.env.STRIPE_SECRET_KEY!,
-          publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-          webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,
+        manualAdapter({
+          label: 'Create order',
         }),
       ],
     },

@@ -39,5 +39,7 @@ services:
       - '13005:3000'
     env_file:
       - ./.env
+    volumes:
+      - ./data/uploads:/app/public/media
     restart: always
     stdin_open: true

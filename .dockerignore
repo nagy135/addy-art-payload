@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+.cursor
+.vscode
+data
+data/mongo
+data/mongo/**
+data/mongo/.mongodb
+docker-compose*.yml

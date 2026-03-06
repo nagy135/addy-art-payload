@@ -42,3 +42,4 @@ next-env.d.ts
 public/media
 
 /data/mongo
+/docker-compose.yml

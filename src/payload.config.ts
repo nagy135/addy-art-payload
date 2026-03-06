@@ -29,6 +29,9 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    importMap: {
+      autoGenerate: false,
+    },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
@@ -84,6 +87,7 @@ export default buildConfig({
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
+    autoGenerate: false,
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   // Sharp is now an optional dependency -

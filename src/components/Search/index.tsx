@@ -8,9 +8,10 @@ import React from 'react'
 
 type Props = {
   className?: string
+  target?: string
 }
 
-export const Search: React.FC<Props> = ({ className }) => {
+export const Search: React.FC<Props> = ({ className, target = 'products' }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -38,7 +39,7 @@ export const Search: React.FC<Props> = ({ className }) => {
         defaultValue={searchParams?.get('q') || ''}
         key={searchParams?.get('q')}
         name="search"
-        placeholder="Search for products..."
+        placeholder={`Search for ${target}`}
         type="text"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">

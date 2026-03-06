@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   mongo:
     image: mongo:latest
@@ -7,7 +6,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
     ports:
-      - "127.0.0.1:27017:27017"
+      - '127.0.0.1:27017:27017'
     volumes:
       - ./data/mongo:/data/db
 
@@ -30,6 +29,12 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./.
+      args:
+        DATABASE_URL: ${DATABASE_URL_BUILD:-mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password123}@host.docker.internal:27017/sensory_minds?authSource=admin}
+      extra_hosts:
+        - 'host.docker.internal:host-gateway'
+    depends_on:
+      - mongo
     ports:
       - '13005:3000'
     env_file:

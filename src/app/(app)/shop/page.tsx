@@ -12,14 +12,89 @@ export const metadata = {
 
 type SearchParams = { [key: string]: string | string[] | undefined }
 
+type CategoryDoc = {
+  id: string
+  parent?: null | string | { id: string }
+}
+
+const getSearchParam = (value: string | string[] | undefined): string | undefined => {
+  if (Array.isArray(value)) return value[0]
+
+  return value
+}
+
+const getCategoryID = (value: CategoryDoc['parent']): null | string => {
+  if (!value) return null
+
+  if (typeof value === 'string') return value
+
+  return value.id
+}
+
+const getCategoryIDsWithDescendants = (
+  categories: CategoryDoc[],
+  rootCategoryID: string,
+): string[] => {
+  const childrenByParent = new Map<string, string[]>()
+
+  categories.forEach((category) => {
+    const parentID = getCategoryID(category.parent)
+
+    if (!parentID) return
+
+    const siblings = childrenByParent.get(parentID) ?? []
+    siblings.push(category.id)
+    childrenByParent.set(parentID, siblings)
+  })
+
+  const ids = new Set<string>([rootCategoryID])
+  const queue = [rootCategoryID]
+
+  while (queue.length > 0) {
+    const currentID = queue.shift()
+
+    if (!currentID) continue
+
+    const childIDs = childrenByParent.get(currentID) ?? []
+
+    childIDs.forEach((childID) => {
+      if (ids.has(childID)) return
+
+      ids.add(childID)
+      queue.push(childID)
+    })
+  }
+
+  return [...ids]
+}
+
 type Props = {
   searchParams: Promise<SearchParams>
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { q: searchValue, sort, category } = await searchParams
+  const { q, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
+  const searchValue = getSearchParam(q)
+  const selectedCategory = getSearchParam(category)
   const resolvedSort = resolveProductSort(sort)
+
+  const categoryIDs = selectedCategory
+    ? getCategoryIDsWithDescendants(
+        (
+          await payload.find({
+            collection: 'categories',
+            depth: 0,
+            limit: 1000,
+            pagination: false,
+            select: {
+              parent: true,
+            },
+          })
+        ).docs as CategoryDoc[],
+        selectedCategory,
+      )
+    : []
 
   const products = await payload.find({
     collection: 'products',
@@ -33,7 +108,7 @@ export default async function ShopPage({ searchParams }: Props) {
       priceInEUR: true,
     },
     ...(resolvedSort ? { sort: resolvedSort } : { sort: 'title' }),
-    ...(searchValue || category
+    ...(searchValue || selectedCategory
       ? {
           where: {
             and: [
@@ -60,11 +135,11 @@ export default async function ShopPage({ searchParams }: Props) {
                     },
                   ]
                 : []),
-              ...(category
+              ...(selectedCategory
                 ? [
                     {
                       categories: {
-                        contains: category,
+                        in: categoryIDs,
                       },
                     },
                   ]

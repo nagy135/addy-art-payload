@@ -1,4 +1,5 @@
-import type { CollectionConfig } from 'payload'
+import sharp from 'sharp'
+import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
 
 import {
   FixedToolbarFeature,
@@ -8,6 +9,32 @@ import {
 
 import { adminOnly } from '@/access/adminOnly'
 import { uploadsDir } from '@/utilities/uploadsDir'
+
+const generateBlurDataURL: CollectionBeforeChangeHook = async ({ data, req }) => {
+  const mimeType = req.file?.mimetype
+  const fileBuffer = req.file?.data
+
+  if (!mimeType?.startsWith('image/') || !fileBuffer) {
+    return data
+  }
+
+  const blurBuffer = await sharp(fileBuffer)
+    .rotate()
+    .resize(24, 24, {
+      fit: 'inside',
+      withoutEnlargement: true,
+    })
+    .blur(4)
+    .webp({
+      quality: 50,
+    })
+    .toBuffer()
+
+  return {
+    ...data,
+    blurDataURL: `data:image/webp;base64,${blurBuffer.toString('base64')}`,
+  }
+}
 
 export const Media: CollectionConfig = {
   admin: {
@@ -35,7 +62,17 @@ export const Media: CollectionConfig = {
         },
       }),
     },
+    {
+      name: 'blurDataURL',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
   ],
+  hooks: {
+    beforeChange: [generateBlurDataURL],
+  },
   upload: {
     staticDir: uploadsDir,
   },

@@ -32,11 +32,13 @@ export const Image: React.FC<MediaProps> = (props) => {
   let width: number | undefined | null
   let height: number | undefined | null
   let alt = altFromProps
+  let blurDataURL: string | undefined
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
     const {
       alt: altFromResource,
+      blurDataURL: blurDataURLFromResource,
       filename: fullFilename,
       height: fullHeight,
       url,
@@ -46,6 +48,7 @@ export const Image: React.FC<MediaProps> = (props) => {
     width = widthFromProps ?? fullWidth
     height = heightFromProps ?? fullHeight
     alt = altFromResource
+    blurDataURL = blurDataURLFromResource || undefined
 
     src = url?.startsWith('http')
       ? url
@@ -73,6 +76,8 @@ export const Image: React.FC<MediaProps> = (props) => {
         }
       }}
       priority={priority}
+      placeholder={blurDataURL ? 'blur' : 'empty'}
+      blurDataURL={blurDataURL}
       quality={90}
       sizes={sizes}
       src={src}

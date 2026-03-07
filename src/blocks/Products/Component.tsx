@@ -46,8 +46,6 @@ export const ProductsBlock: React.FC<
     className?: string
   }
 > = async ({ links, richText }) => {
-  console.log('================\n', 'richText: ', richText, '\n================')
-  console.log('================\n', 'links: ', links, '\n================')
   const payload = await getPayload({ config: configPromise })
 
   const latestProducts = await payload.find({

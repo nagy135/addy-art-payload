@@ -3,12 +3,18 @@ import React from 'react'
 
 import { SeedButton } from './SeedButton'
 import './index.scss'
+import { CMSLink } from '../Link'
+import Link from 'next/link'
+import { Button } from '../ui/button'
 
 const baseClass = 'before-dashboard'
 
 export const BeforeDashboard: React.FC = () => {
   return (
     <div className={baseClass}>
+      <Button>
+        <Link href="/">Web</Link>
+      </Button>
       <Banner className={`${baseClass}__banner`} type="success">
         <h4>Welcome to your dashboard!</h4>
       </Banner>

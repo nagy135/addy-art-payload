@@ -54,6 +54,7 @@ export const PostsBlock: React.FC<
     limit: 6,
     overrideAccess: false,
     select: {
+      slug: true,
       title: true,
       alt: true,
       url: true,

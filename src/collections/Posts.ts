@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { slugField } from 'payload'
 
 import {
   FixedToolbarFeature,
@@ -16,6 +17,8 @@ const dirname = path.dirname(filename)
 export const Posts: CollectionConfig = {
   admin: {
     group: 'Content',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug', 'updatedAt'],
   },
   slug: 'posts',
   access: {
@@ -43,6 +46,9 @@ export const Posts: CollectionConfig = {
         },
       }),
     },
+    slugField({
+      position: undefined,
+    }),
   ],
   upload: {
     staticDir: path.resolve(dirname, '../../data/uploads'),

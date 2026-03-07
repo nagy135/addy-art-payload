@@ -2,6 +2,7 @@ import type { Post } from '@/payload-types'
 
 import React from 'react'
 import clsx from 'clsx'
+import Link from 'next/link'
 import { Media } from '@/components/Media'
 
 type Props = {
@@ -9,10 +10,11 @@ type Props = {
 }
 
 export const PostGridItem: React.FC<Props> = ({ post }) => {
-  const { title } = post
+  const { filename, slug, title } = post
+  const href = `/posts/${slug || post.id}`
 
-  return (
-    <div className="relative inline-block h-full w-full group">
+  const content = (
+    <>
       <Media
         className={clsx(
           'relative aspect-square object-cover border rounded-2xl p-8 bg-primary-foreground',
@@ -25,11 +27,17 @@ export const PostGridItem: React.FC<Props> = ({ post }) => {
         width={80}
       />
 
-      {title && (
+      {(title || filename) && (
         <div className="font-mono text-primary/50 group-hover:text-primary flex justify-between items-center mt-4">
-          <div>{title}</div>
+          <div>{title || filename}</div>
         </div>
       )}
-    </div>
+    </>
+  )
+
+  return (
+    <Link className="relative inline-block h-full w-full group" href={href}>
+      {content}
+    </Link>
   )
 }

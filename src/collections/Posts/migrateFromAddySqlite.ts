@@ -267,6 +267,7 @@ export async function migratePostsFromAddySqlite(options?: {
     })
 
     const postData = {
+      slug: sourcePost.slug,
       title: sourcePost.title,
       alt: sourcePost.title,
       caption: markdownToLexical(sourcePost.content_md),

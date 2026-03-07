@@ -43,3 +43,5 @@ public/media
 
 /data/mongo
 /docker-compose.yml
+/public/uploads
+/data/uploads

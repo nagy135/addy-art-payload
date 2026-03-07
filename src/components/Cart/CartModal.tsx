@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Product, Variant } from '@/payload-types'
 import { getPrice } from '@/utilities/pricing'
 
-export function CartModal() {
+export function CartModal({ buttonClassName }: { buttonClassName?: string }) {
   const { cart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -42,7 +42,7 @@ export function CartModal() {
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
       <SheetTrigger asChild>
-        <OpenCartButton quantity={totalQuantity} />
+        <OpenCartButton className={buttonClassName} quantity={totalQuantity} />
       </SheetTrigger>
 
       <SheetContent className="flex flex-col">

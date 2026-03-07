@@ -29,8 +29,6 @@ export function MobileMenu({ menu }: Props) {
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const closeMobileMenu = () => setIsOpen(false)
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
@@ -47,7 +45,7 @@ export function MobileMenu({ menu }: Props) {
 
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger className="relative flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors dark:border-neutral-700 dark:bg-black dark:text-white">
+      <SheetTrigger className="relative flex h-11 w-11 items-center justify-center rounded-md border border-border text-foreground transition-colors hover:bg-accent">
         <MenuIcon className="h-4" />
       </SheetTrigger>
 

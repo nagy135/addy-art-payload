@@ -1,7 +1,6 @@
 import type { Footer } from '@/payload-types'
 
 import { FooterMenu } from '@/components/Footer/menu'
-import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
@@ -42,9 +41,6 @@ export async function Footer() {
           >
             <FooterMenu menu={menu} />
           </Suspense>
-          <div className="md:ml-auto flex flex-col gap-4 items-end">
-            <ThemeSelector />
-          </div>
         </div>
       </div>
       <div className="border-t border-neutral-200 py-6 text-sm dark:border-neutral-700">

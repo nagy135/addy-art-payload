@@ -11,6 +11,7 @@ import type { Header } from 'src/payload-types'
 import { LogoIcon } from '@/components/icons/logo'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
+import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 
 type Props = {
   header: Header
@@ -19,16 +20,17 @@ type Props = {
 export function HeaderClient({ header }: Props) {
   const menu = header.navItems || []
   const pathname = usePathname()
+  const headerLinkClassName = 'text-foreground/70 hover:text-foreground [&.active]:text-foreground'
 
   return (
-    <div className="relative z-20 border-b bg-black">
-      <nav className="flex items-center md:items-end justify-between container pt-2">
+    <div className="relative z-20 border-b border-border bg-background text-foreground transition-colors">
+      <nav className="container flex items-center justify-between gap-4 pt-2">
         <div className="block flex-none md:hidden">
           <Suspense fallback={null}>
             <MobileMenu menu={menu} />
           </Suspense>
         </div>
-        <div className="flex w-full items-end justify-between">
+        <div className="flex w-full items-end justify-between gap-6">
           <div className="flex w-full items-end gap-6 md:w-1/3">
             <Link className="flex w-full items-center justify-center pt-4 pb-4 md:w-auto" href="/">
               <LogoIcon className="w-6 h-auto" />
@@ -40,11 +42,9 @@ export function HeaderClient({ header }: Props) {
                     <CMSLink
                       {...item.link}
                       size={'clear'}
-                      className={cn('relative navLink', {
+                      className={cn('relative navLink', headerLinkClassName, {
                         active:
-                          item.link.url && item.link.url !== '/'
-                            ? pathname.includes(item.link.url)
-                            : false,
+                          item.link.url && item.link.url !== '/' ? pathname.includes(item.link.url) : false,
                       })}
                       appearance="nav"
                     />
@@ -54,10 +54,11 @@ export function HeaderClient({ header }: Props) {
             ) : null}
           </div>
 
-          <div className="flex justify-end md:w-1/3 gap-4">
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart />
+          <div className="flex items-start justify-end gap-4 md:w-1/3">
+            <Suspense fallback={<OpenCartButton className={headerLinkClassName} />}>
+              <Cart buttonClassName={headerLinkClassName} />
             </Suspense>
+            <ThemeSelector />
           </div>
         </div>
       </nav>

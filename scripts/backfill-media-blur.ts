@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { readFile } from 'fs/promises'
 import path from 'path'
 import sharp from 'sharp'
@@ -11,6 +12,8 @@ type MediaDoc = {
   filename?: string | null
   blurDataURL?: string | null
 }
+
+type UploadCollection = 'media' | 'posts'
 
 const createBlurDataURL = async (filePath: string) => {
   const fileBuffer = await readFile(filePath)
@@ -30,9 +33,7 @@ const createBlurDataURL = async (filePath: string) => {
   return `data:image/webp;base64,${blurBuffer.toString('base64')}`
 }
 
-const run = async () => {
-  const payload = await getPayload({ config })
-
+const backfillCollection = async (payload: Awaited<ReturnType<typeof getPayload>>, collection: UploadCollection) => {
   let page = 1
   let processed = 0
   let updated = 0
@@ -41,7 +42,7 @@ const run = async () => {
 
   while (true) {
     const result = await payload.find({
-      collection: 'media',
+      collection,
       depth: 0,
       limit: 100,
       page,
@@ -54,7 +55,7 @@ const run = async () => {
 
       if (!doc.filename) {
         skipped += 1
-        payload.logger.warn(`Skipping media ${doc.id}: missing filename`)
+        payload.logger.warn(`Skipping ${collection} ${doc.id}: missing filename`)
         continue
       }
 
@@ -69,7 +70,7 @@ const run = async () => {
         }
 
         await payload.update({
-          collection: 'media',
+          collection,
           id: doc.id,
           data: {
             blurDataURL,
@@ -77,11 +78,11 @@ const run = async () => {
         })
 
         updated += 1
-        payload.logger.info(`Updated blurDataURL for media ${doc.id} (${doc.filename})`)
+        payload.logger.info(`Updated blurDataURL for ${collection} ${doc.id} (${doc.filename})`)
       } catch (error) {
         failed += 1
         const message = error instanceof Error ? error.message : String(error)
-        payload.logger.error(`Failed media ${doc.id} (${doc.filename}): ${message}`)
+        payload.logger.error(`Failed ${collection} ${doc.id} (${doc.filename}): ${message}`)
       }
     }
 
@@ -93,8 +94,15 @@ const run = async () => {
   }
 
   payload.logger.info(
-    `Backfill complete. processed=${processed} updated=${updated} skipped=${skipped} failed=${failed}`,
+    `Backfill complete for ${collection}. processed=${processed} updated=${updated} skipped=${skipped} failed=${failed}`,
   )
+}
+
+const run = async () => {
+  const payload = await getPayload({ config })
+
+  await backfillCollection(payload, 'media')
+  await backfillCollection(payload, 'posts')
 }
 
 run()

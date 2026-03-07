@@ -45,3 +45,4 @@ public/media
 /docker-compose.yml
 /public/uploads
 /data/uploads
+/*.gz

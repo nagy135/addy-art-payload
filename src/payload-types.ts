@@ -736,6 +736,7 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  blurDataURL?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1674,6 +1675,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   alt?: T;
   caption?: T;
+  blurDataURL?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

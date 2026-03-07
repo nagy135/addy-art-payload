@@ -40,6 +40,6 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./data/uploads:/app/public/media
+      - ./data/uploads:/app/data/uploads
     restart: always
     stdin_open: true

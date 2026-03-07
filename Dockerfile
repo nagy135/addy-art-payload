@@ -67,9 +67,8 @@ RUN mkdir -p /app/logs && \
     chmod 777 /app/logs /app/logs/error.log /app/logs/combined.log && \
     chown -R nextjs:nodejs /app/logs
 
-RUN mkdir -p /app/uploads/exits && \
-    mkdir -p /app/uploads/products && \
-    chown -R nextjs:nodejs /app/uploads
+RUN mkdir -p /app/data/uploads && \
+    chown -R nextjs:nodejs /app/data
 
 USER nextjs
 

@@ -6,13 +6,9 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 import { adminOnly } from '@/access/adminOnly'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+import { uploadsDir } from '@/utilities/uploadsDir'
 
 export const Posts: CollectionConfig = {
   admin: {
@@ -51,6 +47,6 @@ export const Posts: CollectionConfig = {
     }),
   ],
   upload: {
-    staticDir: path.resolve(dirname, '../../data/uploads'),
+    staticDir: uploadsDir,
   },
 }

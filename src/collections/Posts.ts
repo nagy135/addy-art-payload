@@ -1,4 +1,12 @@
-import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
+import { CallToAction } from '@/blocks/CallToAction/config'
+import { Content } from '@/blocks/Content/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
+import type {
+  CollectionAfterReadHook,
+  CollectionBeforeChangeHook,
+  CollectionConfig,
+  PayloadRequest,
+} from 'payload'
 import { slugField } from 'payload'
 
 import {
@@ -37,6 +45,29 @@ const generateBlurDataURL: CollectionBeforeChangeHook = async ({ data, req }) =>
   }
 }
 
+const getPostFileURL = ({ filename, req }: { filename: string; req: PayloadRequest }) => {
+  const apiRoute = req.payload.config.routes.api || '/api'
+
+  return `${apiRoute}/posts/file/${encodeURIComponent(filename)}`
+}
+
+const normalizePostUploadURLs: CollectionAfterReadHook = ({ doc, req }) => {
+  if (!doc?.filename) {
+    return doc
+  }
+
+  const fileURL = getPostFileURL({
+    filename: doc.filename,
+    req,
+  })
+
+  return {
+    ...doc,
+    thumbnailURL: fileURL,
+    url: fileURL,
+  }
+}
+
 export const Posts: CollectionConfig = {
   admin: {
     group: 'Content',
@@ -54,6 +85,19 @@ export const Posts: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+    },
+    {
+      name: 'gallery',
+      type: 'array',
+      minRows: 1,
+      fields: [
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+        },
+      ],
     },
     {
       name: 'alt',
@@ -76,14 +120,21 @@ export const Posts: CollectionConfig = {
         readOnly: true,
       },
     },
+    {
+      name: 'layout',
+      type: 'blocks',
+      blocks: [CallToAction, Content, MediaBlock],
+    },
     slugField({
       position: undefined,
     }),
   ],
   hooks: {
+    afterRead: [normalizePostUploadURLs],
     beforeChange: [generateBlurDataURL],
   },
   upload: {
+    displayPreview: false,
     staticDir: uploadsDir,
   },
 }

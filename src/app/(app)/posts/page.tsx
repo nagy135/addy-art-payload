@@ -1,5 +1,6 @@
 import { Grid } from '@/components/Grid'
 import { Media } from '@/components/Media'
+import type { Media as MediaType, Post } from '@/payload-types'
 import { FilterList } from '@/components/layout/search/filter'
 import { Search } from '@/components/Search'
 import { contentSorting } from '@/lib/constants'
@@ -19,26 +20,23 @@ type Props = {
   searchParams: Promise<SearchParams>
 }
 
+type PostWithGallery = Post & {
+  gallery?:
+    | {
+        image?: MediaType | string | null
+      }[]
+    | null
+}
+
 export default async function PostsPage({ searchParams }: Props) {
   const { q: searchValue, sort } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
   const posts = await payload.find({
     collection: 'posts',
+    depth: 1,
     draft: false,
     overrideAccess: false,
-    select: {
-      alt: true,
-      filename: true,
-      height: true,
-      slug: true,
-      thumbnailURL: true,
-      title: true,
-      updatedAt: true,
-      url: true,
-      width: true,
-      createdAt: true,
-    },
     ...(sort ? { sort } : { sort: 'title' }),
     ...(searchValue
       ? {
@@ -100,24 +98,39 @@ export default async function PostsPage({ searchParams }: Props) {
             {posts?.docs.length > 0 ? (
               <Grid className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.docs.map((post) => {
-                  const href = `/posts/${post.slug || post.id}`
+                  const href = post.slug ? `/posts/${post.slug}` : null
+                  const image = getPostImage(post as PostWithGallery)
 
                   return (
                     <div
                       key={post.id}
                       className="group overflow-hidden rounded-2xl border border-border bg-card transition-transform duration-200 hover:-translate-y-1"
                     >
-                      <Link className="block aspect-square overflow-hidden bg-muted" href={href}>
-                        <Media
-                          resource={post}
-                          imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
-                        />
-                      </Link>
+                      {href ? (
+                        <Link
+                          className="block aspect-square overflow-hidden bg-muted"
+                          href={href}
+                          prefetch={false}
+                        >
+                          <Media
+                            resource={image}
+                            imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
+                          />
+                        </Link>
+                      ) : (
+                        <div className="block aspect-square overflow-hidden bg-muted">
+                          <Media
+                            resource={image}
+                            imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
+                          />
+                        </div>
+                      )}
                       <div className="px-4 py-3 text-center">
-                        {(post.slug || post.id) ? (
+                        {href ? (
                           <Link
                             className="text-sm font-medium tracking-wide text-foreground hover:underline"
                             href={href}
+                            prefetch={false}
                           >
                             {post.title || post.filename || 'Untitled post'}
                           </Link>
@@ -137,4 +150,11 @@ export default async function PostsPage({ searchParams }: Props) {
       </div>
     </Suspense>
   )
+}
+
+const getPostImage = (post: PostWithGallery) => {
+  const firstGalleryImage =
+    typeof post.gallery?.[0]?.image === 'object' ? (post.gallery[0].image as MediaType) : null
+
+  return firstGalleryImage || post
 }

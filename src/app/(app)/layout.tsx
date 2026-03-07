@@ -11,7 +11,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import React from 'react'
 import './globals.css'
-import { headers } from 'next/headers'
+import { draftMode, headers } from 'next/headers'
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -42,6 +42,8 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   await headers()
+  const { isEnabled: isDraftMode } = await draftMode()
+
   return (
     <html
       className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
@@ -56,7 +58,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <Providers>
           <AdminBar />
-          <LivePreviewListener />
+          {isDraftMode ? <LivePreviewListener /> : null}
           <Header />
           <main>{children}</main>
           <Footer />

@@ -23,7 +23,7 @@ const collectionLabels = {
   },
 }
 
-const Title: React.FC = () => <span>Dashboard</span>
+const Title: React.FC = () => <span>Admin</span>
 
 export const AdminBar: React.FC<{
   adminBarProps?: PayloadAdminBarProps
@@ -43,7 +43,7 @@ export const AdminBar: React.FC<{
 
   return (
     <div
-      className={cn('py-2 bg-black text-white', {
+      className={cn('relative z-50 py-2 bg-black text-white', {
         block: show,
         hidden: !show,
       })}
@@ -74,7 +74,7 @@ export const AdminBar: React.FC<{
             backgroundColor: 'transparent',
             padding: 0,
             position: 'relative',
-            zIndex: 'unset',
+            zIndex: 50,
           }}
         />
       </div>

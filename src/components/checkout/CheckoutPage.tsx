@@ -20,6 +20,7 @@ import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { getPrice } from '@/utilities/pricing'
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
@@ -331,12 +332,12 @@ export const CheckoutPage: React.FC = () => {
               if (!quantity) return null
 
               let image = gallery?.[0]?.image || meta?.image
-              let price = product?.priceInUSD
+              let price = getPrice(product)
 
               const isVariant = Boolean(variant) && typeof variant === 'object'
 
               if (isVariant) {
-                price = variant?.priceInUSD
+                price = getPrice(variant)
 
                 const imageVariant = product.gallery?.find(
                   (galleryItem: NonNullable<Product['gallery']>[number]) => {

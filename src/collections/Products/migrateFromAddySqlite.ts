@@ -374,8 +374,8 @@ export async function migrateProductsFromAddySqlite(options?: {
       description: markdownToLexical(sourceProduct.description_md),
       gallery,
       categories: categoryIds,
-      priceInUSDEnabled: true,
-      priceInUSD: sourceProduct.price_cents,
+      priceInEUREnabled: true,
+      priceInEUR: sourceProduct.price_cents,
       inventory: sourceProduct.is_recreatable ? 99 : 1,
       _status: 'published' as const,
     }

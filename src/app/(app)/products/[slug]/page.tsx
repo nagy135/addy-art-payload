@@ -13,6 +13,7 @@ import React, { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
+import { getHighestProductPrice, getPrice } from '@/utilities/pricing'
 
 type Args = {
   params: Promise<{
@@ -81,16 +82,7 @@ export default async function ProductPage({ params }: Args) {
       })
     : product.inventory! > 0
 
-  let price = product.priceInUSD
-
-  if (product.enableVariants && product?.variants?.docs?.length) {
-    price = product?.variants?.docs?.reduce((acc, variant) => {
-      if (typeof variant === 'object' && variant?.priceInUSD && acc && variant?.priceInUSD > acc) {
-        return variant.priceInUSD
-      }
-      return acc
-    }, price)
-  }
+  const price = getHighestProductPrice(product)
 
   const productJsonLd = {
     name: product.title,
@@ -102,7 +94,7 @@ export default async function ProductPage({ params }: Args) {
       '@type': 'AggregateOffer',
       availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       price: price,
-      priceCurrency: 'usd',
+      priceCurrency: 'EUR',
     },
   }
 
@@ -169,10 +161,10 @@ function RelatedProducts({ products }: { products: Product[] }) {
             <Link className="relative h-full w-full" href={`/products/${product.slug}`}>
               <GridTileImage
                 label={{
-                  amount: product.priceInUSD!,
+                  amount: getPrice(product)!,
                   title: product.title,
                 }}
-                media={product.meta?.image as Media}
+                media={getProductImage(product)}
               />
             </Link>
           </li>
@@ -180,6 +172,15 @@ function RelatedProducts({ products }: { products: Product[] }) {
       </ul>
     </div>
   )
+}
+
+const getProductImage = (product: Product): Media => {
+  const firstGalleryImage =
+    typeof product.gallery?.[0]?.image === 'object' ? (product.gallery[0].image as Media) : null
+
+  const metaImage = typeof product.meta?.image === 'object' ? (product.meta.image as Media) : null
+
+  return (firstGalleryImage || metaImage) as Media
 }
 
 const queryProductBySlug = async ({ slug }: { slug: string }) => {
@@ -207,7 +208,7 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
     populate: {
       variants: {
         title: true,
-        priceInUSD: true,
+        priceInEUR: true,
         inventory: true,
         options: true,
       },

@@ -100,7 +100,7 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
           paymentMethod: methodName,
           status: 'pending',
           amount: cart.subtotal || 0,
-          currency: cart.currency || 'USD',
+          currency: cart.currency || 'EUR',
           cart: cart.id,
           ...(req.user
             ? {
@@ -123,7 +123,7 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
         data: {
           items,
           amount: cart.subtotal || 0,
-          currency: cart.currency || 'USD',
+          currency: cart.currency || 'EUR',
           status: 'processing',
           transactions: [transaction.id],
           ...(req.user

@@ -3,6 +3,7 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
+import { resolveProductSort } from '@/utilities/pricing'
 
 export const metadata = {
   description: 'Search for products in the store.',
@@ -18,6 +19,7 @@ type Props = {
 export default async function ShopPage({ searchParams }: Props) {
   const { q: searchValue, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
+  const resolvedSort = resolveProductSort(sort)
 
   const products = await payload.find({
     collection: 'products',
@@ -28,9 +30,9 @@ export default async function ShopPage({ searchParams }: Props) {
       slug: true,
       gallery: true,
       categories: true,
-      priceInUSD: true,
+      priceInEUR: true,
     },
-    ...(sort ? { sort } : { sort: 'title' }),
+    ...(resolvedSort ? { sort: resolvedSort } : { sort: 'title' }),
     ...(searchValue || category
       ? {
           where: {

@@ -21,6 +21,7 @@ import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product, Variant } from '@/payload-types'
+import { getPrice } from '@/utilities/pricing'
 
 export function CartModal() {
   const { cart } = useCart()
@@ -78,12 +79,12 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
+                  let price = getPrice(product)
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInUSD
+                    price = getPrice(variant)
 
                     const imageVariant = product.gallery?.find(
                       (galleryItem: NonNullable<Product['gallery']>[number]) => {

@@ -46,6 +46,8 @@ export const ProductsBlock: React.FC<
     className?: string
   }
 > = async ({ links, richText }) => {
+  console.log('================\n', 'richText: ', richText, '\n================')
+  console.log('================\n', 'links: ', links, '\n================')
   const payload = await getPayload({ config: configPromise })
 
   const latestProducts = await payload.find({
@@ -58,7 +60,7 @@ export const ProductsBlock: React.FC<
       title: true,
       slug: true,
       gallery: true,
-      priceInUSD: true,
+      priceInEUR: true,
       variants: true,
     },
     sort: '-createdAt',

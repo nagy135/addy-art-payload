@@ -10,11 +10,13 @@ import { manualAdapter } from '@/payments/manual'
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { ProductsCollection } from '@/collections/Products'
+import { VariantsCollection } from '@/collections/Variants'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
 import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
+import { euroCurrenciesConfig } from '@/utilities/pricing'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
@@ -87,6 +89,7 @@ export const plugins: Plugin[] = [
     customers: {
       slug: 'users',
     },
+    currencies: euroCurrenciesConfig,
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
@@ -124,6 +127,9 @@ export const plugins: Plugin[] = [
     },
     products: {
       productsCollectionOverride: ProductsCollection,
+      variants: {
+        variantsCollectionOverride: VariantsCollection,
+      },
     },
   }),
 ]

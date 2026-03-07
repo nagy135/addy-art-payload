@@ -2,7 +2,7 @@ import { Grid } from '@/components/Grid'
 import { Media } from '@/components/Media'
 import { FilterList } from '@/components/layout/search/filter'
 import { Search } from '@/components/Search'
-import { sorting } from '@/lib/constants'
+import { contentSorting } from '@/lib/constants'
 import configPromise from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
@@ -81,7 +81,7 @@ export default async function PostsPage({ searchParams }: Props) {
 
         <div className="flex flex-col items-start justify-between gap-16 md:flex-row md:gap-4">
           <div className="basis-1/5 flex w-full flex-none flex-col gap-4 md:gap-8">
-            <FilterList list={sorting} title="Sort by" />
+            <FilterList list={contentSorting} title="Sort by" />
           </div>
           <div className="min-h-screen w-full">
             {searchValue ? (

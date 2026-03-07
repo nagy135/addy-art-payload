@@ -2,6 +2,7 @@ import { AuthProvider } from '@/providers/Auth'
 import { EcommerceProvider } from '@payloadcms/plugin-ecommerce/client/react'
 import { manualAdapterClient } from '@/payments/manual'
 import React from 'react'
+import { euroCurrenciesConfig } from '@/utilities/pricing'
 
 import { HeaderThemeProvider } from './HeaderTheme'
 import { ThemeProvider } from './Theme'
@@ -17,6 +18,7 @@ export const Providers: React.FC<{
           <SonnerProvider />
           <EcommerceProvider
             enableVariants={true}
+            currenciesConfig={euroCurrenciesConfig}
             api={{
               cartsFetchQuery: {
                 depth: 2,

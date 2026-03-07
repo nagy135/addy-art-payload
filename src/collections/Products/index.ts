@@ -19,6 +19,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 import { DefaultDocumentIDType, Where } from 'payload'
+import { overrideEuroPriceFields } from '@/utilities/overrideEuroPriceFields'
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
@@ -49,7 +50,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     variants: true,
     enableVariants: true,
     gallery: true,
-    priceInUSD: true,
+    priceInEUR: true,
     inventory: true,
     meta: true,
   },
@@ -142,7 +143,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
         },
         {
           fields: [
-            ...defaultCollection.fields,
+            ...overrideEuroPriceFields(defaultCollection.fields),
             {
               name: 'relatedProducts',
               type: 'relationship',

@@ -10,9 +10,13 @@ export const defaultSort: SortFilterItem = {
   title: 'Alphabetic A-Z',
 }
 
-export const sorting: SortFilterItem[] = [
+export const contentSorting: SortFilterItem[] = [
   defaultSort,
   { slug: '-createdAt', reverse: true, title: 'Latest arrivals' },
-  { slug: 'priceInUSD', reverse: false, title: 'Price: Low to high' }, // asc
-  { slug: '-priceInUSD', reverse: true, title: 'Price: High to low' },
+]
+
+export const productSorting: SortFilterItem[] = [
+  ...contentSorting,
+  { slug: 'price', reverse: false, title: 'Price: Low to high' },
+  { slug: '-price', reverse: true, title: 'Price: High to low' },
 ]

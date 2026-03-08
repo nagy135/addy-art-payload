@@ -20,14 +20,6 @@ type Props = {
   searchParams: Promise<SearchParams>
 }
 
-type PostWithGallery = Post & {
-  gallery?:
-    | {
-        image?: MediaType | string | null
-      }[]
-    | null
-}
-
 export default async function PostsPage({ searchParams }: Props) {
   const { q: searchValue, sort } = await searchParams
   const payload = await getPayload({ config: configPromise })
@@ -99,7 +91,8 @@ export default async function PostsPage({ searchParams }: Props) {
               <Grid className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {posts.docs.map((post) => {
                   const href = post.slug ? `/posts/${post.slug}` : null
-                  const image = getPostImage(post as PostWithGallery)
+                  const image = getPostImage(post)
+                  const title = post.title || 'Untitled post'
 
                   return (
                     <div
@@ -112,17 +105,29 @@ export default async function PostsPage({ searchParams }: Props) {
                           href={href}
                           prefetch={false}
                         >
-                          <Media
-                            resource={image}
-                            imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
-                          />
+                          {image ? (
+                            <Media
+                              resource={image}
+                              imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                              No image
+                            </div>
+                          )}
                         </Link>
                       ) : (
                         <div className="block aspect-square overflow-hidden bg-muted">
-                          <Media
-                            resource={image}
-                            imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
-                          />
+                          {image ? (
+                            <Media
+                              resource={image}
+                              imgClassName="h-full w-full object-cover transition duration-300 ease-in-out group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                              No image
+                            </div>
+                          )}
                         </div>
                       )}
                       <div className="px-4 py-3 text-center">
@@ -132,11 +137,11 @@ export default async function PostsPage({ searchParams }: Props) {
                             href={href}
                             prefetch={false}
                           >
-                            {post.title || post.filename || 'Untitled post'}
+                            {title}
                           </Link>
                         ) : (
                           <h2 className="text-sm font-medium tracking-wide text-foreground">
-                            {post.title || post.filename || 'Untitled post'}
+                            {title}
                           </h2>
                         )}
                       </div>
@@ -152,9 +157,9 @@ export default async function PostsPage({ searchParams }: Props) {
   )
 }
 
-const getPostImage = (post: PostWithGallery) => {
+const getPostImage = (post: Post) => {
   const firstGalleryImage =
     typeof post.gallery?.[0]?.image === 'object' ? (post.gallery[0].image as MediaType) : null
 
-  return firstGalleryImage || post
+  return firstGalleryImage
 }

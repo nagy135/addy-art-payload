@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
           ],
         }
       : undefined,
-    title: post.title || post.filename || 'Post',
+    title: post.title || 'Post',
   }
 }
 
@@ -82,15 +82,19 @@ export default async function PostPage({ params }: Args) {
               <Gallery gallery={gallery} />
             ) : (
               <div className="overflow-hidden rounded-2xl border bg-card">
-                <Media imgClassName="h-full w-full object-cover" resource={postImage} />
+                {postImage ? (
+                  <Media imgClassName="h-full w-full object-cover" resource={postImage} />
+                ) : (
+                  <div className="flex min-h-80 items-center justify-center px-4 py-12 text-center text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                    No image
+                  </div>
+                )}
               </div>
             )}
 
             <div className="flex flex-col gap-6">
               <div className="space-y-3">
-                <h1 className="text-3xl font-semibold tracking-tight">
-                  {post.title || post.filename || 'Untitled post'}
-                </h1>
+                <h1 className="text-3xl font-semibold tracking-tight">{post.title || 'Untitled post'}</h1>
                 <p className="text-sm text-muted-foreground">{post.alt}</p>
               </div>
             </div>
@@ -141,5 +145,5 @@ const getPostImage = (post: PostWithMedia) => {
   const firstGalleryImage =
     typeof post.gallery?.[0]?.image === 'object' ? (post.gallery[0].image as MediaType) : null
 
-  return firstGalleryImage || post
+  return firstGalleryImage
 }

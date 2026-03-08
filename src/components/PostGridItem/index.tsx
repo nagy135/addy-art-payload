@@ -55,7 +55,11 @@ export const PostGridItem: React.FC<Props> = ({ post }) => {
   }
 
   return (
-    <Link className="relative inline-block h-full w-full group" href={`/posts/${slug}`} prefetch={false}>
+    <Link
+      className="relative inline-block h-full w-full group"
+      href={`/posts/${slug}`}
+      prefetch={false}
+    >
       {content}
     </Link>
   )

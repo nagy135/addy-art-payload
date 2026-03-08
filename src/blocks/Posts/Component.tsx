@@ -56,13 +56,8 @@ export const PostsBlock: React.FC<
     select: {
       slug: true,
       title: true,
+      gallery: true,
       alt: true,
-      url: true,
-      filename: true,
-      mimeType: true,
-      filesize: true,
-      width: true,
-      height: true,
     },
     sort: '-createdAt',
   })

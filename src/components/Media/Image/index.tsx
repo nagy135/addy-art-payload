@@ -36,8 +36,13 @@ export const Image: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, filename: fullFilename, height: fullHeight, url, width: fullWidth } =
-      resource
+    const {
+      alt: altFromResource,
+      filename: fullFilename,
+      height: fullHeight,
+      url,
+      width: fullWidth,
+    } = resource
     const blurDataURLFromResource =
       'blurDataURL' in resource && typeof resource.blurDataURL === 'string'
         ? resource.blurDataURL

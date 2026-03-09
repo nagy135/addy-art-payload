@@ -17,6 +17,8 @@ import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { euroCurrenciesConfig } from '@/utilities/pricing'
+import * as Sentry from '@sentry/nextjs'
+import { sentryPlugin } from '@payloadcms/plugin-sentry'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
@@ -29,6 +31,7 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  sentryPlugin({ Sentry }),
   seoPlugin({
     generateTitle,
     generateURL,

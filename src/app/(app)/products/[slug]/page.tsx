@@ -120,7 +120,7 @@ export default async function ProductPage({ params }: Args) {
           <div className="h-full w-full basis-full lg:basis-1/2">
             <Suspense
               fallback={
-                <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg border bg-card" />
               }
             >
               {Boolean(gallery?.length) && <Gallery gallery={gallery} />}

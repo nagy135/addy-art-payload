@@ -18,9 +18,10 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-2xl border bg-card">
+      <div className="relative aspect-square overflow-hidden rounded-2xl border bg-card">
         <Media
-          className="w-full"
+          fill
+          className="h-full w-full"
           imgClassName="h-full w-full object-cover"
           resource={gallery[current]}
         />

@@ -82,11 +82,16 @@ export default async function PostPage({ params }: Args) {
             {gallery.length ? (
               <Gallery gallery={gallery} />
             ) : (
-              <div className="overflow-hidden rounded-2xl border bg-card">
+              <div className="relative aspect-square overflow-hidden rounded-2xl border bg-card">
                 {postImage ? (
-                  <Media imgClassName="h-full w-full object-cover" resource={postImage} />
+                  <Media
+                    fill
+                    className="h-full w-full"
+                    imgClassName="h-full w-full object-cover"
+                    resource={postImage}
+                  />
                 ) : (
-                  <div className="flex min-h-80 items-center justify-center px-4 py-12 text-center text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="flex h-full items-center justify-center px-4 py-12 text-center text-sm uppercase tracking-[0.2em] text-muted-foreground">
                     No image
                   </div>
                 )}

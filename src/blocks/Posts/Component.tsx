@@ -1,14 +1,12 @@
 import React from 'react'
 
-import type { Post, PostsBlock as PostsBlockProps } from '@/payload-types'
+import type { PostsBlock as PostsBlockProps } from '@/payload-types'
 
 import { Grid } from '@/components/Grid'
 import { PostGridItem } from '@/components/PostGridItem'
 import { RichText } from '@/components/RichText'
 
-type PostsBlockComponentProps = PostsBlockProps & {
-  pickedPosts?: Post[] | null
-}
+type PostsBlockComponentProps = PostsBlockProps
 
 type RichTextNode = {
   type: string
@@ -58,8 +56,9 @@ export const PostsBlock: React.FC<
 
         {posts.length > 0 ? (
           <Grid className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => {
-              return <PostGridItem key={post.id} post={post} />
+            {posts.map((post, index) => {
+              if (typeof post === 'string') return null
+              return <PostGridItem key={post.id || index} post={post} />
             })}
           </Grid>
         ) : null}

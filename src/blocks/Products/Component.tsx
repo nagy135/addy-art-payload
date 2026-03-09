@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { Product, ProductsBlock as ProductsBlockProps } from '@/payload-types'
+import type { ProductsBlock as ProductsBlockProps } from '@/payload-types'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -9,9 +9,7 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import { RichText } from '@/components/RichText'
 import { CMSLink } from '@/components/Link'
 
-type ProductsBlockComponentProps = ProductsBlockProps & {
-  pickedProducts?: Product[] | null
-}
+type ProductsBlockComponentProps = ProductsBlockProps
 
 type RichTextNode = {
   type: string
@@ -61,8 +59,9 @@ export const ProductsBlock: React.FC<
 
         {products.length > 0 ? (
           <Grid className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => {
-              return <ProductGridItem key={product.id} product={product} />
+            {products.map((product, index) => {
+              if (typeof product === 'string') return null
+              return <ProductGridItem key={product.id || index} product={product} />
             })}
           </Grid>
         ) : null}

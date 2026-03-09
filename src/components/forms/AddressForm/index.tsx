@@ -24,6 +24,7 @@ type AddressFormValues = {
   title?: string | null
   firstName?: string | null
   lastName?: string | null
+  email?: string | null
   company?: string | null
   addressLine1?: string | null
   addressLine2?: string | null
@@ -36,7 +37,9 @@ type AddressFormValues = {
 
 type Props = {
   addressID?: Config['db']['defaultIDType']
-  initialData?: Omit<Address, 'country' | 'id' | 'updatedAt' | 'createdAt'> & { country?: string }
+  initialData?: Partial<Omit<Address, 'country' | 'id' | 'updatedAt' | 'createdAt'>> & {
+    country?: string
+  }
   callback?: (data: Partial<Address>) => void
   /**
    * If true, the form will not submit to the API.
@@ -128,6 +131,23 @@ export const AddressForm: React.FC<Props> = ({
             {errors.lastName && <FormError message={errors.lastName.message} />}
           </FormItem>
         </div>
+
+        <FormItem>
+          <Label htmlFor="email">Email*</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register('email', {
+              required: 'Email is required.',
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: 'Enter a valid email address.',
+              },
+            })}
+          />
+          {errors.email && <FormError message={errors.email.message} />}
+        </FormItem>
 
         <FormItem>
           <Label htmlFor="phone">Phone</Label>

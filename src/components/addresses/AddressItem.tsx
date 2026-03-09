@@ -42,6 +42,7 @@ export const AddressItem: React.FC<Props> = ({
           {address.title && <span>{address.title} </span>}
           {address.firstName} {address.lastName}
         </p>
+        <p>{address.email && <span>{address.email} </span>}</p>
         <p>{address.company && <span>{address.company} </span>}</p>
         <p>{address.phone && <span>{address.phone}</span>}</p>
         <p>

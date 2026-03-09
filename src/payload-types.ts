@@ -241,10 +241,11 @@ export interface Order {
         id?: string | null;
       }[]
     | null;
-  shippingAddress?: {
+  shippingAddress: {
     title?: string | null;
     firstName?: string | null;
     lastName?: string | null;
+    email: string;
     company?: string | null;
     addressLine1?: string | null;
     addressLine2?: string | null;
@@ -1186,10 +1187,11 @@ export interface Transaction {
     | null;
   paymentMethod?: 'manual' | null;
   manual?: {};
-  billingAddress?: {
+  billingAddress: {
     title?: string | null;
     firstName?: string | null;
     lastName?: string | null;
+    email: string;
     company?: string | null;
     addressLine1?: string | null;
     addressLine2?: string | null;
@@ -1242,6 +1244,7 @@ export interface Address {
   title?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  email: string;
   company?: string | null;
   addressLine1?: string | null;
   addressLine2?: string | null;
@@ -1873,6 +1876,7 @@ export interface AddressesSelect<T extends boolean = true> {
   title?: T;
   firstName?: T;
   lastName?: T;
+  email?: T;
   company?: T;
   addressLine1?: T;
   addressLine2?: T;
@@ -2009,6 +2013,7 @@ export interface OrdersSelect<T extends boolean = true> {
         title?: T;
         firstName?: T;
         lastName?: T;
+        email?: T;
         company?: T;
         addressLine1?: T;
         addressLine2?: T;
@@ -2049,6 +2054,7 @@ export interface TransactionsSelect<T extends boolean = true> {
         title?: T;
         firstName?: T;
         lastName?: T;
+        email?: T;
         company?: T;
         addressLine1?: T;
         addressLine2?: T;

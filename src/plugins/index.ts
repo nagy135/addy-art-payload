@@ -86,6 +86,19 @@ export const plugins: Plugin[] = [
       isAdmin,
       isDocumentOwner,
     },
+    addresses: {
+      addressFields: ({ defaultFields }) => {
+        return [
+          ...defaultFields.slice(0, 3),
+          {
+            name: 'email',
+            type: 'email',
+            required: true,
+          },
+          ...defaultFields.slice(3),
+        ]
+      },
+    },
     customers: {
       slug: 'users',
     },

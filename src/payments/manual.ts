@@ -1,6 +1,27 @@
 import type { GroupField } from 'payload'
 
+import { euroCurrenciesConfig } from '@/utilities/pricing'
+
 const methodName = 'manual'
+
+const defaultCurrency = euroCurrenciesConfig.defaultCurrency.toUpperCase()
+const supportedCurrencies = new Set(
+  euroCurrenciesConfig.supportedCurrencies.map(({ code }) => code.toUpperCase()),
+)
+
+const normalizeCurrency = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return defaultCurrency
+  }
+
+  const normalizedValue = value.trim().toUpperCase()
+
+  if (!normalizedValue || !supportedCurrencies.has(normalizedValue)) {
+    return defaultCurrency
+  }
+
+  return normalizedValue
+}
 
 type AdapterArgs = {
   label?: string
@@ -93,6 +114,8 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
         throw new Error('A customer email is required to create an order.')
       }
 
+      const currency = normalizeCurrency(cart.currency)
+
       const transaction = await payload.create({
         collection: transactionsSlug,
         data: {
@@ -100,7 +123,7 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
           paymentMethod: methodName,
           status: 'pending',
           amount: cart.subtotal || 0,
-          currency: cart.currency || 'EUR',
+          currency,
           cart: cart.id,
           ...(req.user
             ? {
@@ -123,7 +146,7 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
         data: {
           items,
           amount: cart.subtotal || 0,
-          currency: cart.currency || 'EUR',
+          currency,
           status: 'processing',
           transactions: [transaction.id],
           ...(req.user
@@ -155,7 +178,9 @@ export const manualAdapter = ({ label }: AdapterArgs = {}) => {
         id: cartID,
         collection: cartsSlug,
         data: {
+          currency,
           purchasedAt: new Date().toISOString(),
+          status: 'purchased',
         },
         req,
       })

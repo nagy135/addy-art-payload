@@ -9,6 +9,7 @@ import {
   OrderedListFeature,
   UnderlineFeature,
   UnorderedListFeature,
+  UploadFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -55,6 +56,21 @@ export default buildConfig({
         ItalicFeature(),
         OrderedListFeature(),
         UnorderedListFeature(),
+        UploadFeature({
+          collections: {
+            uploads: {
+              // Example showing how to customize the built-in fields
+              // of the Upload feature
+              fields: [
+                {
+                  name: 'caption',
+                  type: 'richText',
+                  editor: lexicalEditor(),
+                },
+              ],
+            },
+          },
+        }),
         LinkFeature({
           enabledCollections: ['pages'],
           fields: ({ defaultFields }) => {

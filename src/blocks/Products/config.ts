@@ -7,8 +7,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { linkGroup } from '../../fields/linkGroup'
-
 export const Products: Block = {
   slug: 'products',
   interfaceName: 'ProductsBlock',
@@ -28,12 +26,14 @@ export const Products: Block = {
       }),
       label: false,
     },
-    linkGroup({
-      appearances: ['default', 'outline'],
-      overrides: {
-        maxRows: 2,
-      },
-    }),
+    {
+      name: 'pickedProducts',
+      type: 'relationship',
+      hasMany: true,
+      maxRows: 6,
+      relationTo: 'products',
+      label: 'Products',
+    },
   ],
   labels: {
     plural: 'Products',

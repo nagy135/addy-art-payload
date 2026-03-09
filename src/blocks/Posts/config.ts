@@ -7,8 +7,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { linkGroup } from '../../fields/linkGroup'
-
 export const Posts: Block = {
   slug: 'posts',
   interfaceName: 'PostsBlock',
@@ -28,12 +26,14 @@ export const Posts: Block = {
       }),
       label: false,
     },
-    linkGroup({
-      appearances: ['default', 'outline'],
-      overrides: {
-        maxRows: 2,
-      },
-    }),
+    {
+      name: 'pickedPosts',
+      type: 'relationship',
+      hasMany: true,
+      relationTo: 'posts',
+      maxRows: 6,
+      label: 'Posts',
+    },
   ],
   labels: {
     plural: 'Posts',

@@ -1,21 +1,13 @@
 import React from 'react'
 
 import type { Post, PostsBlock as PostsBlockProps } from '@/payload-types'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 
 import { Grid } from '@/components/Grid'
 import { PostGridItem } from '@/components/PostGridItem'
 import { RichText } from '@/components/RichText'
-import { CMSLink } from '@/components/Link'
-
-type LinkItem = {
-  link: React.ComponentProps<typeof CMSLink>
-  id?: string | null
-}
 
 type PostsBlockComponentProps = PostsBlockProps & {
-  links?: LinkItem[] | null
+  pickedPosts?: Post[] | null
 }
 
 type RichTextNode = {
@@ -45,27 +37,10 @@ export const PostsBlock: React.FC<
     id?: string | number
     className?: string
   }
-> = async ({ links, richText }) => {
-  const payload = await getPayload({ config: configPromise })
+> = async ({ pickedPosts: posts, richText }) => {
+  const showHeader = hasRichTextContent(richText)
 
-  const latestPosts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: 6,
-    overrideAccess: false,
-    select: {
-      slug: true,
-      title: true,
-      gallery: true,
-      alt: true,
-    },
-    sort: '-createdAt',
-  })
-
-  const posts = latestPosts.docs as Post[]
-  const blockLinks: LinkItem[] = Array.isArray(links) ? links : []
-  const showHeader = hasRichTextContent(richText) || blockLinks.length > 0
-
+  if (!posts) return null
   if (!showHeader && posts.length === 0) return null
 
   return (
@@ -77,11 +52,6 @@ export const PostsBlock: React.FC<
               {hasRichTextContent(richText) ? (
                 <RichText className="mb-0" data={richText!} enableGutter={false} />
               ) : null}
-            </div>
-            <div className="flex flex-col gap-8">
-              {blockLinks.map(({ link }: LinkItem, i: number) => {
-                return <CMSLink key={i} size="lg" {...link} />
-              })}
             </div>
           </div>
         ) : null}

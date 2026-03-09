@@ -9,13 +9,8 @@ import { ProductGridItem } from '@/components/ProductGridItem'
 import { RichText } from '@/components/RichText'
 import { CMSLink } from '@/components/Link'
 
-type LinkItem = {
-  link: React.ComponentProps<typeof CMSLink>
-  id?: string | null
-}
-
 type ProductsBlockComponentProps = ProductsBlockProps & {
-  links?: LinkItem[] | null
+  pickedProducts?: Product[] | null
 }
 
 type RichTextNode = {
@@ -45,34 +40,10 @@ export const ProductsBlock: React.FC<
     id?: string | number
     className?: string
   }
-> = async ({ links, richText }) => {
-  const payload = await getPayload({ config: configPromise })
+> = async ({ pickedProducts: products, richText }) => {
+  const showHeader = hasRichTextContent(richText)
 
-  const latestProducts = await payload.find({
-    collection: 'products',
-    depth: 1,
-    draft: false,
-    limit: 6,
-    overrideAccess: false,
-    select: {
-      title: true,
-      slug: true,
-      gallery: true,
-      priceInEUR: true,
-      variants: true,
-    },
-    sort: '-createdAt',
-    where: {
-      _status: {
-        equals: 'published',
-      },
-    },
-  })
-
-  const products = latestProducts.docs as Product[]
-  const blockLinks: LinkItem[] = Array.isArray(links) ? links : []
-  const showHeader = hasRichTextContent(richText) || blockLinks.length > 0
-
+  if (!products) return null
   if (!showHeader && products.length === 0) return null
 
   return (
@@ -84,11 +55,6 @@ export const ProductsBlock: React.FC<
               {hasRichTextContent(richText) ? (
                 <RichText className="mb-0" data={richText!} enableGutter={false} />
               ) : null}
-            </div>
-            <div className="flex flex-col gap-8">
-              {blockLinks.map(({ link }: LinkItem, i: number) => {
-                return <CMSLink key={i} size="lg" {...link} />
-              })}
             </div>
           </div>
         ) : null}

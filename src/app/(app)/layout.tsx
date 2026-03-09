@@ -1,11 +1,16 @@
 import type { ReactNode } from 'react'
 
+import * as Sentry from '@sentry/nextjs'
+import type { Metadata } from 'next'
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import { Providers } from '@/providers'
+import { InitTheme } from '@/providers/Theme/InitTheme'
+import { GeistMono } from 'geist/font/mono'
+import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 import './globals.css'
 import { draftMode, headers } from 'next/headers'
@@ -37,17 +42,42 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
     }),
 } */
 
+export function generateMetadata(): Metadata {
+  return {
+    icons: {
+      icon: [
+        { rel: 'icon', url: '/favicon.ico', sizes: '32x32' },
+        { rel: 'icon', url: '/favicon.svg', type: 'image/svg+xml' },
+      ],
+    },
+    other: {
+      ...Sentry.getTraceData(),
+    },
+  }
+}
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   await headers()
   const { isEnabled: isDraftMode } = await draftMode()
 
   return (
-    <Providers>
-      <AdminBar />
-      {isDraftMode ? <LivePreviewListener /> : null}
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </Providers>
+    <html
+      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      lang="en"
+      suppressHydrationWarning
+    >
+      <head>
+        <InitTheme />
+      </head>
+      <body>
+        <Providers>
+          <AdminBar />
+          {isDraftMode ? <LivePreviewListener /> : null}
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
+      </body>
+    </html>
   )
 }

@@ -32,7 +32,6 @@ export const Categories: CollectionConfig = {
       relationTo: 'categories',
       index: true,
       admin: {
-        position: 'sidebar',
         description: 'Optional parent category to create nested category trees.',
       },
       filterOptions: ({ id }) => {
@@ -52,6 +51,16 @@ export const Categories: CollectionConfig = {
       on: 'parent',
       admin: {
         allowCreate: false,
+      },
+    },
+    {
+      name: 'treeEditor',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '@/components/admin/categories/CategoryTreeEditor#CategoryTreeEditor',
+        },
       },
     },
     slugField({

@@ -1,0 +1,119 @@
+@import '~@payloadcms/ui/scss';
+
+.category-tree-editor {
+  display: grid;
+  gap: 1rem;
+
+  &__header {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    h3 {
+      margin: 0 0 0.25rem;
+    }
+
+    p {
+      margin: 0;
+      color: var(--theme-text);
+      opacity: 0.8;
+      max-width: 48rem;
+    }
+  }
+
+  &__root-button {
+    border: 1px solid var(--theme-elevation-250);
+    background: var(--theme-elevation-0);
+    color: var(--theme-text);
+    border-radius: 999px;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+  }
+
+  &__tree {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &__row {
+    position: relative;
+  }
+
+  &__card {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.5rem;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--theme-elevation-200);
+    background: linear-gradient(180deg, var(--theme-elevation-0), var(--theme-elevation-50));
+    color: var(--theme-text);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--theme-success-500);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__drag-handle {
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.65;
+    cursor: grab;
+  }
+
+  &__title {
+    flex: 1;
+    font-weight: 600;
+  }
+
+  &__badge {
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    background: color-mix(in srgb, var(--theme-success-500) 16%, white);
+    color: var(--theme-success-700);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__row--current &__card {
+    border-color: var(--theme-success-500);
+    background: linear-gradient(135deg, rgba(27, 130, 95, 0.14), var(--theme-elevation-0));
+    box-shadow: 0 14px 30px rgba(27, 130, 95, 0.14);
+  }
+
+  &__row--dragging &__card {
+    opacity: 0.7;
+  }
+
+  &__row--invalid &__card {
+    border-color: var(--theme-error-500);
+    background: linear-gradient(135deg, rgba(186, 65, 65, 0.12), var(--theme-elevation-0));
+  }
+
+  @include small-break {
+    &__header {
+      flex-direction: column;
+    }
+
+    &__root-button {
+      width: 100%;
+    }
+  }
+}

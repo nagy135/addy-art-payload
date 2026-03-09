@@ -1,6 +1,8 @@
 import { CallToAction } from '@/blocks/CallToAction/config'
 import { Content } from '@/blocks/Content/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
+import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import type { CollectionConfig } from 'payload'
 import { slugField } from 'payload'
 
@@ -17,12 +19,26 @@ export const Posts: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    livePreview: {
+      url: ({ data, req }) =>
+        generatePreviewPath({
+          slug: data?.slug,
+          collection: 'posts',
+          req,
+        }),
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        slug: data?.slug as string,
+        collection: 'posts',
+        req,
+      }),
   },
   slug: 'posts',
   access: {
     create: adminOnly,
     delete: adminOnly,
-    read: () => true,
+    read: adminOrPublishedStatus,
     update: adminOnly,
   },
   fields: [
@@ -66,4 +82,10 @@ export const Posts: CollectionConfig = {
       position: undefined,
     }),
   ],
+  versions: {
+    drafts: {
+      autosave: true,
+    },
+    maxPerDoc: 50,
+  },
 }

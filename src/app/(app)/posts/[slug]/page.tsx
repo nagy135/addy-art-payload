@@ -9,6 +9,7 @@ import configPromise from '@payload-config'
 import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon } from 'lucide-react'
 import { getPayload } from 'payload'
+import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -94,7 +95,9 @@ export default async function PostPage({ params }: Args) {
 
             <div className="flex flex-col gap-6">
               <div className="space-y-3">
-                <h1 className="text-3xl font-semibold tracking-tight">{post.title || 'Untitled post'}</h1>
+                <h1 className="text-3xl font-semibold tracking-tight">
+                  {post.title || 'Untitled post'}
+                </h1>
                 <p className="text-sm text-muted-foreground">{post.alt}</p>
               </div>
             </div>
@@ -114,26 +117,25 @@ export default async function PostPage({ params }: Args) {
 }
 
 const queryPostBySlug = async ({ slug }: { slug: string }) => {
+  const { isEnabled: draft } = await draftMode()
+
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
     collection: 'posts',
     depth: 1,
+    draft,
     limit: 1,
-    overrideAccess: false,
+    overrideAccess: draft,
     pagination: false,
     where: {
-      or: [
+      and: [
         {
           slug: {
             equals: slug,
           },
         },
-        {
-          id: {
-            equals: slug,
-          },
-        },
+        ...(draft ? [] : [{ _status: { equals: 'published' } }]),
       ],
     },
   })

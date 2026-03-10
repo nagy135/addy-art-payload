@@ -22,6 +22,7 @@ import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
 import { Footer } from '@/globals/Footer'
+import { demoSendEmailTask, scheduleDemoSendEmailEndpoint } from '@/jobs/demoSendEmail'
 import { Header } from '@/globals/Header'
 import { plugins } from './plugins'
 import { Posts } from './collections/Posts'
@@ -98,8 +99,20 @@ export default buildConfig({
       ]
     },
   }),
+  jobs: {
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => {
+      return {
+        ...defaultJobsCollection,
+        admin: {
+          ...(defaultJobsCollection.admin || {}),
+          hidden: false,
+        },
+      }
+    },
+    tasks: [demoSendEmailTask],
+  },
   //email: nodemailerAdapter(),
-  endpoints: [],
+  endpoints: [scheduleDemoSendEmailEndpoint],
   globals: [Header, Footer],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',

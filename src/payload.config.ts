@@ -1,4 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 import {
   BoldFeature,
@@ -111,7 +112,19 @@ export default buildConfig({
     },
     tasks: [demoSendEmailTask],
   },
-  //email: nodemailerAdapter(),
+  email: nodemailerAdapter({
+    defaultFromAddress: process.env.GMAIL_FROM_ADDRESS || process.env.GMAIL_USER || '',
+    defaultFromName: process.env.GMAIL_FROM_NAME || process.env.COMPANY_NAME || 'Addy Art',
+    transportOptions: {
+      auth: {
+        pass: process.env.GMAIL_APP_PASSWORD,
+        user: process.env.GMAIL_USER,
+      },
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+    },
+  }),
   endpoints: [scheduleDemoSendEmailEndpoint],
   globals: [Header, Footer],
   plugins,

@@ -19,6 +19,7 @@ import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { euroCurrenciesConfig } from '@/utilities/pricing'
 import * as Sentry from '@sentry/nextjs'
 import { sentryPlugin } from '@payloadcms/plugin-sentry'
+import { sendOrderConfirmationEmail } from '@/collections/Orders/hooks/sendOrderConfirmationEmail'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
@@ -109,6 +110,13 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
+        hooks: {
+          ...defaultCollection.hooks,
+          afterChange: [
+            ...(defaultCollection.hooks?.afterChange || []),
+            sendOrderConfirmationEmail,
+          ],
+        },
         fields: [
           ...defaultCollection.fields,
           {

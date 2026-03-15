@@ -18,7 +18,7 @@ export async function FormBlock(props: Props) {
     collection: 'forms',
     id: String(formID),
     depth: 1,
-    locale: locale as never,
+    locale,
   })
 
   return (

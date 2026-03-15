@@ -11,8 +11,8 @@ export async function Header() {
   const header = await payload.findGlobal({
     slug: 'header',
     depth: 1,
-    locale: locale as never,
-    fallbackLocale: false as never,
+    locale,
+    fallbackLocale: false,
   })
 
   return <HeaderClient header={header} />

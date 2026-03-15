@@ -1,4 +1,4 @@
-import type { Config } from 'src/payload-types'
+import type { Config } from '@/payload-types'
 
 import type { FrontendLocale } from '@/custom-translations'
 import configPromise from '@payload-config'
@@ -13,7 +13,7 @@ async function getGlobal<T extends Global>(slug: T, depth = 0, locale?: Frontend
   const global = await payload.findGlobal({
     slug,
     depth,
-    ...(locale ? { locale: locale as never } : {}),
+    ...(locale ? { locale } : {}),
   })
 
   return global

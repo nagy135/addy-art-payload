@@ -94,7 +94,7 @@ const queryPageBySlug = async ({ slug }: { slug: string }) => {
     collection: 'pages',
     draft,
     limit: 1,
-    locale: locale as never,
+    locale,
     overrideAccess: draft,
     pagination: false,
     where: {

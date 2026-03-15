@@ -16,8 +16,8 @@ export async function Footer() {
   const footer: Footer = await payload.findGlobal({
     slug: 'footer',
     depth: 1,
-    locale: locale as never,
-    fallbackLocale: false as never,
+    locale,
+    fallbackLocale: false,
   })
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()

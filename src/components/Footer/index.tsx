@@ -1,7 +1,9 @@
 import type { Footer } from '@/payload-types'
 
+import configPromise from '@payload-config'
 import { FooterMenu } from '@/components/Footer/menu'
-import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getFrontendLocale } from '@/i18n/frontend-server'
+import { getPayload } from 'payload'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 import { LogoIcon } from '@/components/icons/logo'
@@ -9,7 +11,14 @@ import { LogoIcon } from '@/components/icons/logo'
 const { COMPANY_NAME, SITE_NAME } = process.env
 
 export async function Footer() {
-  const footer: Footer = await getCachedGlobal('footer', 1)()
+  const locale = await getFrontendLocale()
+  const payload = await getPayload({ config: configPromise })
+  const footer: Footer = await payload.findGlobal({
+    slug: 'footer',
+    depth: 1,
+    locale: locale as never,
+    fallbackLocale: false as never,
+  })
   const menu = footer.navItems || []
   const currentYear = new Date().getFullYear()
   const copyrightDate = 2023 + (currentYear > 2023 ? `-${currentYear}` : '')

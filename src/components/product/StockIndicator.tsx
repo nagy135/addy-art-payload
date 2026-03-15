@@ -1,5 +1,6 @@
 'use client'
 import { Product, Variant } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
@@ -9,6 +10,7 @@ type Props = {
 
 export const StockIndicator: React.FC<Props> = ({ product }) => {
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
 
   const variants = product.variants?.docs || []
 
@@ -45,8 +47,10 @@ export const StockIndicator: React.FC<Props> = ({ product }) => {
 
   return (
     <div className="uppercase font-mono text-sm font-medium text-gray-500">
-      {stockQuantity < 10 && stockQuantity > 0 && <p>Only {stockQuantity} left in stock</p>}
-      {(stockQuantity === 0 || !stockQuantity) && <p>Out of stock</p>}
+      {stockQuantity < 10 && stockQuantity > 0 && (
+        <p>{t('product.onlyLeftInStock', { stockQuantity })}</p>
+      )}
+      {(stockQuantity === 0 || !stockQuantity) && <p>{t('product.outOfStock')}</p>}
     </div>
   )
 }

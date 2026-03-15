@@ -1,4 +1,5 @@
 import configPromise from '@payload-config'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import { getPayload } from 'payload'
 import clsx from 'clsx'
 import React, { Suspense } from 'react'
@@ -87,6 +88,7 @@ function CategoryTree({ categories, level = 0 }: { categories: CategoryNode[]; l
 
 async function CategoryList() {
   const payload = await getPayload({ config: configPromise })
+  const { t } = await getServerTranslation()
 
   const categories = await payload.find({
     collection: 'categories',
@@ -100,7 +102,7 @@ async function CategoryList() {
   return (
     <div className="rounded-xl border border-neutral-200/80 bg-white/60 p-3 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-950/40">
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
-        Category
+        {t('general.category')}
       </h3>
       <CategoryTree categories={categoryTree} />
     </div>

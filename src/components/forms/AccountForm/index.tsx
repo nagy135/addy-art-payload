@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User } from '@/payload-types'
 import { useAuth } from '@/providers/Auth'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useRouter } from 'next/navigation'
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -23,6 +24,7 @@ type FormData = {
 export const AccountForm: React.FC = () => {
   const { setUser, user } = useAuth()
   const [changePassword, setChangePassword] = useState(false)
+  const { t } = useTranslation()
 
   const {
     formState: { errors, isLoading, isSubmitting, isDirty },
@@ -53,7 +55,7 @@ export const AccountForm: React.FC = () => {
         if (response.ok) {
           const json = await response.json()
           setUser(json.doc)
-          toast.success('Successfully updated account.')
+          toast.success(t('auth.updateAccountSuccess'))
           setChangePassword(false)
           reset({
             name: json.doc.name,
@@ -62,18 +64,18 @@ export const AccountForm: React.FC = () => {
             passwordConfirm: '',
           })
         } else {
-          toast.error('There was a problem updating your account.')
+          toast.error(t('auth.updateAccountError'))
         }
       }
     },
-    [user, setUser, reset],
+    [user, setUser, reset, t],
   )
 
   useEffect(() => {
     if (user === null) {
       router.push(
         `/login?error=${encodeURIComponent(
-          'You must be logged in to view this page.',
+          t('auth.mustBeLoggedIn'),
         )}&redirect=${encodeURIComponent('/account')}`,
       )
     }
@@ -87,7 +89,7 @@ export const AccountForm: React.FC = () => {
         passwordConfirm: '',
       })
     }
-  }, [user, router, reset, changePassword])
+  }, [user, router, reset, changePassword, t])
 
   return (
     <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
@@ -95,27 +97,27 @@ export const AccountForm: React.FC = () => {
         <Fragment>
           <div className="prose dark:prose-invert mb-8">
             <p className="">
-              {'Change your account details below, or '}
+              {`${t('account.changeDetailsDescription')} `}
               <Button
                 className="px-0 text-inherit underline hover:cursor-pointer"
                 onClick={() => setChangePassword(!changePassword)}
                 type="button"
                 variant="link"
               >
-                click here
+                {t('account.clickHere')}
               </Button>
-              {' to change your password.'}
+              {` ${t('auth.switchToPasswordChange')}`}
             </p>
           </div>
 
           <div className="flex flex-col gap-8 mb-8">
             <FormItem>
               <Label htmlFor="email" className="mb-2">
-                Email Address
+                {t('auth.emailAddress')}
               </Label>
               <Input
                 id="email"
-                {...register('email', { required: 'Please provide an email.' })}
+                {...register('email', { required: t('auth.provideEmailForAccount') })}
                 type="email"
               />
               {errors.email && <FormError message={errors.email.message} />}
@@ -123,11 +125,11 @@ export const AccountForm: React.FC = () => {
 
             <FormItem>
               <Label htmlFor="name" className="mb-2">
-                Name
+                {t('auth.name')}
               </Label>
               <Input
                 id="name"
-                {...register('name', { required: 'Please provide a name.' })}
+                {...register('name', { required: t('auth.nameRequired') })}
                 type="text"
               />
               {errors.name && <FormError message={errors.name.message} />}
@@ -138,14 +140,14 @@ export const AccountForm: React.FC = () => {
         <Fragment>
           <div className="prose dark:prose-invert mb-8">
             <p>
-              {'Change your password below, or '}
+              {`${t('auth.changePasswordDescription')} `}
               <Button
                 className="px-0 text-inherit underline hover:cursor-pointer"
                 onClick={() => setChangePassword(!changePassword)}
                 type="button"
                 variant="link"
               >
-                cancel
+                {t('general.cancel')}
               </Button>
               .
             </p>
@@ -154,11 +156,11 @@ export const AccountForm: React.FC = () => {
           <div className="flex flex-col gap-8 mb-8">
             <FormItem>
               <Label htmlFor="password" className="mb-2">
-                New password
+                {t('auth.newPassword')}
               </Label>
               <Input
                 id="password"
-                {...register('password', { required: 'Please provide a new password.' })}
+                {...register('password', { required: t('auth.newPasswordRequired') })}
                 type="password"
               />
               {errors.password && <FormError message={errors.password.message} />}
@@ -166,13 +168,13 @@ export const AccountForm: React.FC = () => {
 
             <FormItem>
               <Label htmlFor="passwordConfirm" className="mb-2">
-                Confirm password
+                {t('auth.confirmNewPassword')}
               </Label>
               <Input
                 id="passwordConfirm"
                 {...register('passwordConfirm', {
-                  required: 'Please confirm your new password.',
-                  validate: (value) => value === password.current || 'The passwords do not match',
+                  required: t('auth.confirmNewPasswordRequired'),
+                  validate: (value) => value === password.current || t('auth.passwordMismatch'),
                 })}
                 type="password"
               />
@@ -183,10 +185,10 @@ export const AccountForm: React.FC = () => {
       )}
       <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
         {isLoading || isSubmitting
-          ? 'Processing'
+          ? t('auth.processing')
           : changePassword
-            ? 'Change Password'
-            : 'Update Account'}
+            ? t('auth.changePasswordSubmit')
+            : t('account.updateAccount')}
       </Button>
     </form>
   )

@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Address } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
 import { useState } from 'react'
 
@@ -22,17 +23,17 @@ type Props = {
   setSubmit?: React.Dispatch<React.SetStateAction<() => void | Promise<void>>>
 }
 
-export const CheckoutAddresses: React.FC<Props> = ({
-  setAddress,
-  heading = 'Addresses',
-  description = 'Please select or add your shipping and billing addresses.',
-}) => {
+export const CheckoutAddresses: React.FC<Props> = ({ setAddress, heading, description }) => {
   const { addresses } = useAddresses()
+  const { t } = useTranslation()
+
+  const resolvedHeading = heading ?? t('checkout.addresses')
+  const resolvedDescription = description ?? t('checkout.addressesDescription')
 
   if (!addresses || addresses.length === 0) {
     return (
       <div>
-        <p>No addresses found. Please add an address.</p>
+        <p>{t('checkout.noAddressesFound')}</p>
 
         <CreateAddressModal />
       </div>
@@ -42,8 +43,8 @@ export const CheckoutAddresses: React.FC<Props> = ({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h3 className="text-xl font-medium mb-2">{heading}</h3>
-        <p className="text-muted-foreground">{description}</p>
+        <h3 className="text-xl font-medium mb-2">{resolvedHeading}</h3>
+        <p className="text-muted-foreground">{resolvedDescription}</p>
       </div>
       <AddressesModal setAddress={setAddress} />
     </div>
@@ -52,6 +53,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
 
 const AddressesModal: React.FC<Props> = ({ setAddress }) => {
   const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
   const handleOpenChange = (state: boolean) => {
     setOpen(state)
   }
@@ -62,17 +64,17 @@ const AddressesModal: React.FC<Props> = ({ setAddress }) => {
   const { addresses } = useAddresses()
 
   if (!addresses || addresses.length === 0) {
-    return <p>No addresses found. Please add an address.</p>
+    return <p>{t('checkout.noAddressesFound')}</p>
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={'outline'}>{'Select an address'}</Button>
+        <Button variant={'outline'}>{t('checkout.selectAddress')}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{'Select an address'}</DialogTitle>
+          <DialogTitle>{t('checkout.selectAddress')}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-12">
@@ -89,7 +91,7 @@ const AddressesModal: React.FC<Props> = ({ setAddress }) => {
                         closeModal()
                       }}
                     >
-                      Select
+                      {t('checkout.selectButton')}
                     </Button>
                   }
                 />

@@ -1,9 +1,7 @@
 import { Media } from '@/components/Media'
-import { OrderStatus } from '@/components/OrderStatus'
 import { Price } from '@/components/Price'
-import { Button } from '@/components/ui/button'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import { Media as MediaType, Order, Product, Variant } from '@/payload-types'
-import { formatDateTime } from '@/utilities/formatDateTime'
 import { getPrice } from '@/utilities/pricing'
 import Link from 'next/link'
 
@@ -18,13 +16,14 @@ type Props = {
   currencyCode?: string
 }
 
-export const ProductItem: React.FC<Props> = ({
+export const ProductItem = async ({
   product,
   style = 'default',
   quantity,
   variant,
   currencyCode,
-}) => {
+}: Props) => {
+  const { t } = await getServerTranslation()
   const { title } = product
 
   const metaImage =
@@ -91,7 +90,7 @@ export const ProductItem: React.FC<Props> = ({
 
         {itemPrice && quantity && (
           <div className="text-right">
-            <p className="font-medium text-lg">Subtotal</p>
+            <p className="font-medium text-lg">{t('orders.subtotal')}</p>
             <Price
               className="font-mono text-primary/50 text-sm"
               amount={itemPrice * quantity}

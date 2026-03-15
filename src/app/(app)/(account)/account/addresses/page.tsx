@@ -4,6 +4,7 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
 import { Order } from '@/payload-types'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import { getPayload } from 'payload'
 import { redirect } from 'next/navigation'
 import { AddressListing } from '@/components/addresses/AddressListing'
@@ -12,14 +13,13 @@ import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
 export default async function AddressesPage() {
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
+  const { t } = await getServerTranslation()
   const { user } = await payload.auth({ headers })
 
   let orders: Order[] | null = null
 
   if (!user) {
-    redirect(
-      `/login?warning=${encodeURIComponent('Please login to access your account settings.')}`,
-    )
+    redirect(`/login?warning=${encodeURIComponent(t('auth.mustBeLoggedIn'))}`)
   }
 
   try {
@@ -47,7 +47,7 @@ export default async function AddressesPage() {
   return (
     <>
       <div className="border p-8 rounded-lg bg-primary-foreground">
-        <h1 className="text-3xl font-medium mb-8">Addresses</h1>
+        <h1 className="text-3xl font-medium mb-8">{t('account.addresses')}</h1>
 
         <div className="mb-8">
           <AddressListing />

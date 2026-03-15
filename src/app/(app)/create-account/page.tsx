@@ -8,20 +8,22 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
 import { CreateAccountForm } from '@/components/forms/CreateAccountForm'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import { redirect } from 'next/navigation'
 
 export default async function CreateAccount() {
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
+  const { t } = await getServerTranslation()
   const { user } = await payload.auth({ headers })
 
   if (user) {
-    redirect(`/account?warning=${encodeURIComponent('You are already logged in.')}`)
+    redirect(`/account?warning=${encodeURIComponent(t('auth.alreadyLoggedIn'))}`)
   }
 
   return (
     <div className="container py-16">
-      <h1 className="text-xl mb-4">Create Account</h1>
+      <h1 className="text-xl mb-4">{t('auth.createAccountPageTitle')}</h1>
       <RenderParams />
       <CreateAccountForm />
     </div>

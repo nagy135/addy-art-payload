@@ -1,6 +1,7 @@
 'use client'
 
 import type { CartItem } from '@/components/Cart'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
 import { XIcon } from 'lucide-react'
@@ -9,11 +10,12 @@ import React from 'react'
 export function DeleteItemButton({ item }: { item: CartItem }) {
   const { isLoading, removeItem } = useCart()
   const itemId = item.id
+  const { t } = useTranslation()
 
   return (
     <form>
       <button
-        aria-label="Remove cart item"
+        aria-label={t('cart.removeItemAria')}
         className={clsx(
           'ease hover:cursor-pointer flex h-[17px] w-[17px] items-center justify-center rounded-full bg-neutral-500 transition-all duration-200',
           {

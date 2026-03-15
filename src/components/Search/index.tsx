@@ -2,6 +2,7 @@
 
 import { cn } from '@/utilities/cn'
 import { createUrl } from '@/utilities/createUrl'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useDebounce } from '@/utilities/useDebounce'
 import { SearchIcon } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -15,6 +16,7 @@ type Props = {
 export const Search: React.FC<Props> = ({ className, target = 'products' }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
   const query = searchParams?.get('q') || ''
   const [value, setValue] = useState(query)
   const debouncedValue = useDebounce(value)
@@ -74,7 +76,7 @@ export const Search: React.FC<Props> = ({ className, target = 'products' }) => {
         className="w-full rounded-lg border bg-white px-4 py-2 text-sm text-black placeholder:text-neutral-500 dark:border-neutral-800 dark:bg-black dark:text-white dark:placeholder:text-neutral-400"
         name="search"
         onChange={(e) => setValue(e.target.value)}
-        placeholder={`Search for ${target}`}
+        placeholder={t('search.placeholder', { target })}
         type="text"
         value={value}
       />

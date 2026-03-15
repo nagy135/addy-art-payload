@@ -13,10 +13,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useAuth } from '@/providers/Auth'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 interface Props {
   menu: Header['navItems']
@@ -24,6 +26,7 @@ interface Props {
 
 export function MobileMenu({ menu }: Props) {
   const { user } = useAuth()
+  const { t } = useTranslation()
 
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -51,10 +54,14 @@ export function MobileMenu({ menu }: Props) {
 
       <SheetContent side="left" className="px-4">
         <SheetHeader className="px-0 pt-4 pb-0">
-          <SheetTitle>My Store</SheetTitle>
+          <SheetTitle>{t('locale.language')}</SheetTitle>
 
           <SheetDescription />
         </SheetHeader>
+
+        <div className="pt-4">
+          <LanguageSwitcher />
+        </div>
 
         <div className="py-4">
           {menu?.length ? (
@@ -70,35 +77,37 @@ export function MobileMenu({ menu }: Props) {
 
         {user ? (
           <div className="mt-4">
-            <h2 className="text-xl mb-4">My account</h2>
+            <h2 className="text-xl mb-4">{t('account.manageAccount')}</h2>
             <hr className="my-2" />
             <ul className="flex flex-col gap-2">
               <li>
-                <Link href="/orders">Orders</Link>
+                <Link href="/orders">{t('orders.orders')}</Link>
               </li>
               <li>
-                <Link href="/account/addresses">Addresses</Link>
+                <Link href="/account/addresses">{t('account.addresses')}</Link>
               </li>
               <li>
-                <Link href="/account">Manage account</Link>
+                <Link href="/account">{t('account.manageAccount')}</Link>
               </li>
               <li className="mt-6">
                 <Button asChild variant="outline">
-                  <Link href="/logout">Log out</Link>
+                  <Link href="/logout">{t('auth.logout')}</Link>
                 </Button>
               </li>
             </ul>
           </div>
         ) : (
           <div>
-            <h2 className="text-xl mb-4">My account</h2>
+            <h2 className="text-xl mb-4">{t('account.manageAccount')}</h2>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button asChild className="w-full sm:flex-1" variant="outline">
-                <Link href="/login">Log in</Link>
+                <Link href="/login">{t('auth.login')}</Link>
               </Button>
-              <span className="text-center text-sm text-muted-foreground sm:text-base">or</span>
+              <span className="text-center text-sm text-muted-foreground sm:text-base">
+                {t('general.or')}
+              </span>
               <Button asChild className="w-full sm:flex-1">
-                <Link href="/create-account">Create an account</Link>
+                <Link href="/create-account">{t('auth.createAccount')}</Link>
               </Button>
             </div>
           </div>

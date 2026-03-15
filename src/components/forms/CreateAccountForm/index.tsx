@@ -6,6 +6,7 @@ import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { useAuth } from '@/providers/Auth'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -25,6 +26,7 @@ export const CreateAccountForm: React.FC = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
+  const { t } = useTranslation()
 
   const {
     formState: { errors },
@@ -47,7 +49,7 @@ export const CreateAccountForm: React.FC = () => {
       })
 
       if (!response.ok) {
-        const message = response.statusText || 'There was an error creating the account.'
+        const message = response.statusText || t('auth.credentialsError')
         setError(message)
         return
       }
@@ -62,21 +64,21 @@ export const CreateAccountForm: React.FC = () => {
         await login(data)
         clearTimeout(timer)
         if (redirect) router.push(redirect)
-        else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
+        else router.push(`/account?success=${encodeURIComponent(t('auth.successCreated'))}`)
       } catch (_) {
         clearTimeout(timer)
-        setError('There was an error with the credentials provided. Please try again.')
+        setError(t('auth.credentialsError'))
       }
     },
-    [login, router, searchParams],
+    [login, router, searchParams, t],
   )
 
   return (
     <form className="max-w-lg py-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="prose dark:prose-invert mb-6">
         <p>
-          {`This is where new customers can signup and create a new account. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
+          {`${t('auth.signupAdminDescription')} `}
+          <Link href="/admin/collections/users">{t('auth.loginToAdmin')}</Link>.
         </p>
       </div>
 
@@ -85,11 +87,11 @@ export const CreateAccountForm: React.FC = () => {
       <div className="flex flex-col gap-8 mb-8">
         <FormItem>
           <Label htmlFor="email" className="mb-2">
-            Email Address
+            {t('auth.emailAddress')}
           </Label>
           <Input
             id="email"
-            {...register('email', { required: 'Email is required.' })}
+            {...register('email', { required: t('auth.emailRequired') })}
             type="email"
           />
           {errors.email && <FormError message={errors.email.message} />}
@@ -97,11 +99,11 @@ export const CreateAccountForm: React.FC = () => {
 
         <FormItem>
           <Label htmlFor="password" className="mb-2">
-            New password
+            {t('auth.newPassword')}
           </Label>
           <Input
             id="password"
-            {...register('password', { required: 'Password is required.' })}
+            {...register('password', { required: t('auth.passwordRequired') })}
             type="password"
           />
           {errors.password && <FormError message={errors.password.message} />}
@@ -109,13 +111,13 @@ export const CreateAccountForm: React.FC = () => {
 
         <FormItem>
           <Label htmlFor="passwordConfirm" className="mb-2">
-            Confirm Password
+            {t('auth.confirmPassword')}
           </Label>
           <Input
             id="passwordConfirm"
             {...register('passwordConfirm', {
-              required: 'Please confirm your password.',
-              validate: (value) => value === password.current || 'The passwords do not match',
+              required: t('auth.confirmPasswordRequired'),
+              validate: (value) => value === password.current || t('auth.passwordMismatch'),
             })}
             type="password"
           />
@@ -123,13 +125,13 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
       </div>
       <Button disabled={loading} type="submit" variant="default">
-        {loading ? 'Processing' : 'Create Account'}
+        {loading ? t('auth.processing') : t('auth.createAccountSubmit')}
       </Button>
 
       <div className="prose dark:prose-invert mt-8">
         <p>
-          {'Already have an account? '}
-          <Link href={`/login${allParams}`}>Login</Link>
+          {`${t('auth.alreadyHaveAccount')} `}
+          <Link href={`/login${allParams}`}>{t('auth.login')}</Link>
         </p>
       </div>
     </form>

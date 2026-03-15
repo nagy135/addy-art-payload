@@ -1,11 +1,14 @@
 import type { Metadata } from 'next'
 
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import React from 'react'
 
 import { ForgotPasswordForm } from '@/components/forms/ForgotPasswordForm'
 
 export default async function ForgotPasswordPage() {
+  await getServerTranslation()
+
   return (
     <div className="container py-16">
       <ForgotPasswordForm />

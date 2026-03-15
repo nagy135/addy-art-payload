@@ -3,12 +3,14 @@
 import React from 'react'
 import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
 import { AddressItem } from '@/components/addresses/AddressItem'
+import { useTranslation } from '@/providers/FrontendI18n'
 
 export const AddressListing: React.FC = () => {
   const { addresses } = useAddresses()
+  const { t } = useTranslation()
 
   if (!addresses || addresses.length === 0) {
-    return <p>No addresses found.</p>
+    return <p>{t('account.noAddressesFound')}</p>
   }
 
   return (

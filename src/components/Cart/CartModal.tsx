@@ -21,11 +21,13 @@ import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product, Variant } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { getPrice } from '@/utilities/pricing'
 
 export function CartModal({ buttonClassName }: { buttonClassName?: string }) {
   const { cart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation()
 
   const pathname = usePathname()
 
@@ -47,15 +49,15 @@ export function CartModal({ buttonClassName }: { buttonClassName?: string }) {
 
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>My Cart</SheetTitle>
+          <SheetTitle>{t('cart.myCart')}</SheetTitle>
 
-          <SheetDescription>Manage your cart here, add items to view the total.</SheetDescription>
+          <SheetDescription>{t('cart.manage')}</SheetDescription>
         </SheetHeader>
 
         {!cart || cart?.items?.length === 0 ? (
           <div className="text-center flex flex-col items-center gap-2">
             <ShoppingCart className="h-16" />
-            <p className="text-center text-2xl font-bold">Your cart is empty.</p>
+            <p className="text-center text-2xl font-bold">{t('cart.empty')}</p>
           </div>
         ) : (
           <div className="grow flex px-4">
@@ -174,7 +176,7 @@ export function CartModal({ buttonClassName }: { buttonClassName?: string }) {
                 <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
                   {typeof cart?.subtotal === 'number' && (
                     <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
-                      <p>Total</p>
+                      <p>{t('general.total')}</p>
                       <Price
                         amount={cart?.subtotal}
                         className="text-right text-base text-black dark:text-white"
@@ -184,7 +186,7 @@ export function CartModal({ buttonClassName }: { buttonClassName?: string }) {
 
                   <Button asChild>
                     <Link className="w-full" href="/checkout">
-                      Proceed to Checkout
+                      {t('cart.proceedToCheckout')}
                     </Link>
                   </Button>
                 </div>

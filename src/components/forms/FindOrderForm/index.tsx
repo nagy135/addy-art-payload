@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
+import { useTranslation } from '@/providers/FrontendI18n'
 import React, { Fragment, useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { sendOrderAccessEmail } from './sendOrderAccessEmail'
@@ -21,6 +22,7 @@ type Props = {
 
 export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -35,36 +37,37 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
     },
   })
 
-  const onSubmit = useCallback(async (data: FormData) => {
-    setIsSubmitting(true)
-    setSubmitError(null)
+  const onSubmit = useCallback(
+    async (data: FormData) => {
+      setIsSubmitting(true)
+      setSubmitError(null)
 
-    try {
-      const result = await sendOrderAccessEmail({
-        email: data.email,
-        orderID: data.orderID,
-      })
+      try {
+        const result = await sendOrderAccessEmail({
+          email: data.email,
+          orderID: data.orderID,
+        })
 
-      if (result.success) {
-        setSuccess(true)
-      } else {
-        setSubmitError(result.error || 'Something went wrong. Please try again.')
+        if (result.success) {
+          setSuccess(true)
+        } else {
+          setSubmitError(result.error || t('errors.somethingWentWrong'))
+        }
+      } catch {
+        setSubmitError(t('errors.somethingWentWrong'))
+      } finally {
+        setIsSubmitting(false)
       }
-    } catch {
-      setSubmitError('Something went wrong. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [])
+    },
+    [t],
+  )
 
   if (success) {
     return (
       <Fragment>
-        <h1 className="text-xl mb-4">Check your email</h1>
+        <h1 className="text-xl mb-4">{t('orders.checkYourEmail')}</h1>
         <div className="prose dark:prose-invert">
-          <p>
-            {`If an order exists with the provided email and order ID, we've sent you an email with a link to view your order details.`}
-          </p>
+          <p>{t('orders.sendAccessEmailSuccess')}</p>
         </div>
       </Fragment>
     )
@@ -72,30 +75,30 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
 
   return (
     <Fragment>
-      <h1 className="text-xl mb-4">Find my order</h1>
+      <h1 className="text-xl mb-4">{t('orders.findOrder')}</h1>
       <div className="prose dark:prose-invert mb-8">
-        <p>{`Please enter your email and order ID below. We'll send you a link to view your order.`}</p>
+        <p>{t('orders.findOrderHelp')}</p>
       </div>
       <form className="max-w-lg flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
         <FormItem>
           <Label htmlFor="email" className="mb-2">
-            Email address
+            {t('auth.emailAddress')}
           </Label>
           <Input
             id="email"
-            {...register('email', { required: 'Email is required.' })}
+            {...register('email', { required: t('auth.emailRequired') })}
             type="email"
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
         <FormItem>
           <Label htmlFor="orderID" className="mb-2">
-            Order ID
+            {t('orders.orderId')}
           </Label>
           <Input
             id="orderID"
             {...register('orderID', {
-              required: 'Order ID is required.',
+              required: t('orders.orderIdRequired'),
             })}
             type="text"
           />
@@ -103,7 +106,7 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
         </FormItem>
         {submitError && <FormError message={submitError} />}
         <Button type="submit" className="self-start" variant="default" disabled={isSubmitting}>
-          {isSubmitting ? 'Sending...' : 'Find order'}
+          {isSubmitting ? t('orders.sending') : t('orders.findOrder')}
         </Button>
       </form>
     </Fragment>

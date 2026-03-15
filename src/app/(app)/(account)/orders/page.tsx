@@ -2,6 +2,7 @@ import type { Order } from '@/payload-types'
 import type { Metadata } from 'next'
 
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { getServerTranslation } from '@/i18n/frontend-server'
 
 import { OrderItem } from '@/components/OrderItem'
 import { headers as getHeaders } from 'next/headers'
@@ -12,12 +13,13 @@ import { redirect } from 'next/navigation'
 export default async function Orders() {
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
+  const { t } = await getServerTranslation()
   const { user } = await payload.auth({ headers })
 
   let orders: Order[] | null = null
 
   if (!user) {
-    redirect(`/login?warning=${encodeURIComponent('Please login to access your orders.')}`)
+    redirect(`/login?warning=${encodeURIComponent(t('orders.ordersLoginWarning'))}`)
   }
 
   try {
@@ -40,9 +42,9 @@ export default async function Orders() {
   return (
     <>
       <div className="border p-8 rounded-lg bg-primary-foreground w-full">
-        <h1 className="text-3xl font-medium mb-8">Orders</h1>
+        <h1 className="text-3xl font-medium mb-8">{t('orders.orders')}</h1>
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-          <p className="">You have no orders.</p>
+          <p className="">{t('account.withoutOrders')}</p>
         )}
 
         {orders && orders.length > 0 && (

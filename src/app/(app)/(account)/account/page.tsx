@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
 import { AccountForm } from '@/components/forms/AccountForm'
+import { getServerTranslation } from '@/i18n/frontend-server'
 import { Order } from '@/payload-types'
 import { OrderItem } from '@/components/OrderItem'
 import { getPayload } from 'payload'
@@ -14,14 +15,13 @@ import { redirect } from 'next/navigation'
 export default async function AccountPage() {
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
+  const { t } = await getServerTranslation()
   const { user } = await payload.auth({ headers })
 
   let orders: Order[] | null = null
 
   if (!user) {
-    redirect(
-      `/login?warning=${encodeURIComponent('Please login to access your account settings.')}`,
-    )
+    redirect(`/login?warning=${encodeURIComponent(t('auth.mustBeLoggedIn'))}`)
   }
 
   try {
@@ -49,22 +49,19 @@ export default async function AccountPage() {
   return (
     <>
       <div className="border p-8 rounded-lg bg-primary-foreground">
-        <h1 className="text-3xl font-medium mb-8">Account settings</h1>
+        <h1 className="text-3xl font-medium mb-8">{t('account.accountSettings')}</h1>
         <AccountForm />
       </div>
 
       <div className=" border p-8 rounded-lg bg-primary-foreground">
-        <h2 className="text-3xl font-medium mb-8">Recent Orders</h2>
+        <h2 className="text-3xl font-medium mb-8">{t('account.recentOrders')}</h2>
 
         <div className="prose dark:prose-invert mb-8">
-          <p>
-            These are the most recent orders you have placed. Each order is associated with an
-            payment. As you place more orders, they will appear in your orders list.
-          </p>
+          <p>{t('account.recentOrdersDescription')}</p>
         </div>
 
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
-          <p className="mb-8">You have no orders.</p>
+          <p className="mb-8">{t('account.withoutOrders')}</p>
         )}
 
         {orders && orders.length > 0 && (
@@ -78,7 +75,7 @@ export default async function AccountPage() {
         )}
 
         <Button asChild variant="default">
-          <Link href="/orders">View all orders</Link>
+          <Link href="/orders">{t('account.viewAllOrders')}</Link>
         </Button>
       </div>
     </>

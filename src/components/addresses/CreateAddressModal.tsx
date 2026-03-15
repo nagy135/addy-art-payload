@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { AddressForm } from '@/components/forms/AddressForm'
 import { Address } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 import { DefaultDocumentIDType } from 'payload'
 
 type Props = {
@@ -33,6 +34,7 @@ export const CreateAddressModal: React.FC<Props> = ({
   disabled,
 }) => {
   const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
   const handleOpenChange = (state: boolean) => {
     setOpen(state)
   }
@@ -52,12 +54,16 @@ export const CreateAddressModal: React.FC<Props> = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild disabled={disabled}>
-        <Button variant={'outline'}>{buttonText}</Button>
+        <Button variant={'outline'}>
+          {buttonText === 'Add a new address' ? t('address.addNew') : buttonText}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogDescription>This address will be connected to your account.</DialogDescription>
+          <DialogTitle>
+            {modalTitle === 'Add a new address' ? t('address.addNew') : modalTitle}
+          </DialogTitle>
+          <DialogDescription>{t('address.connectedToAccount')}</DialogDescription>
         </DialogHeader>
 
         <AddressForm

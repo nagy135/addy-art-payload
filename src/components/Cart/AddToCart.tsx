@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import type { Product, Variant } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
@@ -15,6 +16,7 @@ type Props = {
 export function AddToCart({ product }: Props) {
   const { addItem, cart, isLoading } = useCart()
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
 
   const variants = product.variants?.docs || []
 
@@ -45,10 +47,10 @@ export function AddToCart({ product }: Props) {
         product: product.id,
         variant: selectedVariant?.id ?? undefined,
       }).then(() => {
-        toast.success('Item added to cart.')
+        toast.success(t('cart.addedToCart'))
       })
     },
-    [addItem, product, selectedVariant],
+    [addItem, product, selectedVariant, t],
   )
 
   const disabled = useMemo<boolean>(() => {
@@ -96,7 +98,7 @@ export function AddToCart({ product }: Props) {
 
   return (
     <Button
-      aria-label="Add to cart"
+      aria-label={t('cart.addToCart')}
       variant={'outline'}
       className={clsx({
         'hover:opacity-90': true,
@@ -105,7 +107,7 @@ export function AddToCart({ product }: Props) {
       onClick={addToCart}
       type="submit"
     >
-      Add To Cart
+      {t('cart.addToCart')}
     </Button>
   )
 }

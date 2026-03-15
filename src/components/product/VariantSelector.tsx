@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
+import { useTranslation } from '@/providers/FrontendI18n'
 
 import { createUrl } from '@/utilities/createUrl'
 import clsx from 'clsx'
@@ -12,6 +13,7 @@ export function VariantSelector({ product }: { product: Product }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
   const variants = product.variants?.docs
   const variantTypes = product.variantTypes
   const hasVariants = Boolean(product.enableVariants && variants?.length && variantTypes?.length)
@@ -108,7 +110,7 @@ export function VariantSelector({ product }: { product: Product }) {
                       scroll: false,
                     })
                   }}
-                  title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                  title={`${option.label}${!isAvailableForSale ? t('product.optionOutOfStockSuffix') : ''}`}
                 >
                   {option.label}
                 </Button>

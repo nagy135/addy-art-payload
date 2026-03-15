@@ -27,6 +27,9 @@ import { demoSendEmailTask, scheduleDemoSendEmailEndpoint } from '@/jobs/demoSen
 import { Header } from '@/globals/Header'
 import { plugins } from './plugins'
 import { Posts } from './collections/Posts'
+import { en } from '@payloadcms/translations/languages/en'
+import { sk } from '@payloadcms/translations/languages/sk'
+import { customTranslations } from '@/custom-translations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,6 +53,15 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
+  i18n: {
+    fallbackLanguage: 'sk',
+    supportedLanguages: { en, sk },
+    translations: customTranslations,
+  },
+  localization: {
+    defaultLocale: 'sk',
+    locales: ['en', 'sk'],
+  },
   editor: lexicalEditor({
     features: () => {
       return [

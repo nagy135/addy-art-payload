@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/providers/FrontendI18n'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -11,6 +12,7 @@ type Props = {
 
 export const AccountNav: React.FC<Props> = ({ className }) => {
   const pathname = usePathname()
+  const { t } = useTranslation()
 
   return (
     <div className={clsx(className)}>
@@ -23,7 +25,7 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
                 'text-primary': pathname === '/account',
               })}
             >
-              Account settings
+              {t('account.accountSettings')}
             </Link>
           </Button>
         </li>
@@ -36,7 +38,7 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
                 'text-primary': pathname === '/account/addresses',
               })}
             >
-              Addresses
+              {t('account.addresses')}
             </Link>
           </Button>
         </li>
@@ -49,7 +51,7 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
               'text-primary': pathname === '/orders' || pathname.includes('/orders'),
             })}
           >
-            <Link href="/orders">Orders</Link>
+            <Link href="/orders">{t('orders.orders')}</Link>
           </Button>
         </li>
       </ul>
@@ -63,7 +65,7 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
           'text-primary': pathname === '/logout',
         })}
       >
-        <Link href="/logout">Log out</Link>
+        <Link href="/logout">{t('auth.logout')}</Link>
       </Button>
     </div>
   )

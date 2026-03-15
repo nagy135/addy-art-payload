@@ -13,6 +13,7 @@ import { GeistSans } from 'geist/font/sans'
 import React from 'react'
 import './globals.css'
 import { draftMode, headers } from 'next/headers'
+import { getFrontendLocale } from '@/i18n/frontend-server'
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -58,18 +59,19 @@ export function generateMetadata(): Metadata {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   await headers()
   const { isEnabled: isDraftMode } = await draftMode()
+  const locale = await getFrontendLocale()
 
   return (
     <html
       className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
     >
       <head>
         <InitTheme />
       </head>
       <body>
-        <Providers>
+        <Providers locale={locale}>
           <AdminBar />
           {isDraftMode ? <LivePreviewListener /> : null}
           <Header />

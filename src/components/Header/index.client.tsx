@@ -12,6 +12,7 @@ import { LogoIcon } from '@/components/icons/logo'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 type Props = {
   header: Header
@@ -44,7 +45,9 @@ export function HeaderClient({ header }: Props) {
                       size={'clear'}
                       className={cn('relative navLink', headerLinkClassName, {
                         active:
-                          item.link.url && item.link.url !== '/' ? pathname.includes(item.link.url) : false,
+                          item.link.url && item.link.url !== '/'
+                            ? pathname.includes(item.link.url)
+                            : false,
                       })}
                       appearance="nav"
                     />
@@ -55,6 +58,7 @@ export function HeaderClient({ header }: Props) {
           </div>
 
           <div className="flex items-start justify-end gap-4 md:w-1/3">
+            <LanguageSwitcher />
             <Suspense fallback={<OpenCartButton className={headerLinkClassName} />}>
               <Cart buttonClassName={headerLinkClassName} />
             </Suspense>

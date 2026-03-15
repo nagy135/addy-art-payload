@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
+import { useTranslation } from '@/providers/FrontendI18n'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -25,6 +26,7 @@ import { getPrice } from '@/utilities/pricing'
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
+  const { t } = useTranslation()
   const { cart, clearCart } = useCart()
   const [error, setError] = useState<null | string>(null)
   /**
@@ -106,10 +108,10 @@ export const CheckoutPage: React.FC = () => {
         }
       }
 
-      let errorMessage = 'An error occurred while creating the order.'
+      let errorMessage = t('checkout.guestOrderError')
 
       if (errorData?.cause?.code === 'OutOfStock') {
-        errorMessage = 'One or more items in your cart are out of stock.'
+        errorMessage = t('checkout.outOfStockError')
       }
 
       setError(errorMessage)
@@ -125,13 +127,14 @@ export const CheckoutPage: React.FC = () => {
     email,
     router,
     shippingAddress,
+    t,
   ])
 
   if (cartIsEmpty && isCreatingOrder) {
     return (
       <div className="py-12 w-full items-center justify-center">
         <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
-          <p>Creating your order...</p>
+          <p>{t('checkout.creatingYourOrder')}</p>
         </div>
         <LoadingSpinner />
       </div>
@@ -141,8 +144,8 @@ export const CheckoutPage: React.FC = () => {
   if (cartIsEmpty) {
     return (
       <div className="prose dark:prose-invert py-12 w-full items-center">
-        <p>Your cart is empty.</p>
-        <Link href="/search">Continue shopping?</Link>
+        <p>{t('cart.empty')}</p>
+        <Link href="/search">{t('checkout.continueShopping')}</Link>
       </div>
     )
   }
@@ -150,16 +153,16 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
       <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
+        <h2 className="font-medium text-3xl">{t('checkout.contact')}</h2>
         {!user && (
           <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
             <div className="prose dark:prose-invert">
               <Button asChild className="no-underline text-inherit" variant="outline">
-                <Link href="/login">Log in</Link>
+                <Link href="/login">{t('auth.login')}</Link>
               </Button>
               <p className="mt-0">
-                <span className="mx-2">or</span>
-                <Link href="/create-account">create an account</Link>
+                <span className="mx-2">{t('general.or')}</span>
+                <Link href="/create-account">{t('auth.createAccount')}</Link>
               </p>
             </div>
           </div>
@@ -169,9 +172,9 @@ export const CheckoutPage: React.FC = () => {
             <div>
               <p>{user.email}</p>{' '}
               <p>
-                Not you?{' '}
+                {t('auth.notYou')}{' '}
                 <Link className="underline" href="/logout">
-                  Log out
+                  {t('auth.logout')}
                 </Link>
               </p>
             </div>
@@ -179,10 +182,10 @@ export const CheckoutPage: React.FC = () => {
         ) : (
           <div className="bg-accent dark:bg-black rounded-lg p-4 ">
             <div>
-              <p className="mb-4">Enter your email to checkout as a guest.</p>
+              <p className="mb-4">{t('auth.enterEmailToCheckout')}</p>
 
               <FormItem className="mb-6">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{t('auth.guestCheckoutEmailLabel')}</Label>
                 <Input
                   disabled={!emailEditable}
                   id="email"
@@ -201,13 +204,13 @@ export const CheckoutPage: React.FC = () => {
                 }}
                 variant="default"
               >
-                Continue as guest
+                {t('auth.continueAsGuest')}
               </Button>
             </div>
           </div>
         )}
 
-        <h2 className="font-medium text-3xl">Address</h2>
+        <h2 className="font-medium text-3xl">{t('checkout.address')}</h2>
 
         {billingAddress ? (
           <div>
@@ -221,14 +224,17 @@ export const CheckoutPage: React.FC = () => {
                     setBillingAddress(undefined)
                   }}
                 >
-                  Remove
+                  {t('general.remove')}
                 </Button>
               }
               address={billingAddress}
             />
           </div>
         ) : user ? (
-          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
+          <CheckoutAddresses
+            heading={t('checkout.billingAddress')}
+            setAddress={setBillingAddress}
+          />
         ) : (
           <CreateAddressModal
             disabled={!email || Boolean(emailEditable)}
@@ -248,7 +254,7 @@ export const CheckoutPage: React.FC = () => {
               setBillingAddressSameAsShipping(state as boolean)
             }}
           />
-          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
+          <Label htmlFor="shippingTheSameAsBilling">{t('checkout.sameAsBilling')}</Label>
         </div>
 
         {!billingAddressSameAsShipping && (
@@ -265,7 +271,7 @@ export const CheckoutPage: React.FC = () => {
                         setShippingAddress(undefined)
                       }}
                     >
-                      Remove
+                      {t('general.remove')}
                     </Button>
                   }
                   address={shippingAddress}
@@ -273,8 +279,8 @@ export const CheckoutPage: React.FC = () => {
               </div>
             ) : user ? (
               <CheckoutAddresses
-                heading="Shipping address"
-                description="Please select a shipping address."
+                heading={t('checkout.shippingAddress')}
+                description={t('checkout.selectShippingAddress')}
                 setAddress={setShippingAddress}
               />
             ) : (
@@ -297,7 +303,7 @@ export const CheckoutPage: React.FC = () => {
             void createOrder()
           }}
         >
-          {isCreatingOrder ? 'Creating order...' : 'Create order'}
+          {isCreatingOrder ? t('checkout.creatingOrder') : t('checkout.createOrder')}
         </Button>
 
         {error && (
@@ -311,7 +317,7 @@ export const CheckoutPage: React.FC = () => {
               }}
               variant="default"
             >
-              Try again
+              {t('errors.tryAgain')}
             </Button>
           </div>
         )}
@@ -319,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
 
       {!cartIsEmpty && (
         <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
-          <h2 className="text-3xl font-medium">Your cart</h2>
+          <h2 className="text-3xl font-medium">{t('cart.yourCart')}</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
               const {
@@ -403,7 +409,7 @@ export const CheckoutPage: React.FC = () => {
           })}
           <hr />
           <div className="flex justify-between items-center gap-2">
-            <span className="uppercase">Total</span>{' '}
+            <span className="uppercase">{t('general.total')}</span>{' '}
             <Price className="text-3xl font-medium" amount={cart.subtotal || 0} />
           </div>
         </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
+import { getFrontendLocale } from '@/i18n/frontend-server'
 import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -85,6 +86,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 
 const queryPageBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
+  const locale = await getFrontendLocale()
 
   const payload = await getPayload({ config: configPromise })
 
@@ -92,6 +94,7 @@ const queryPageBySlug = async ({ slug }: { slug: string }) => {
     collection: 'pages',
     draft,
     limit: 1,
+    locale: locale as never,
     overrideAccess: draft,
     pagination: false,
     where: {
